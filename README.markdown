@@ -117,8 +117,8 @@ Request an array of host/port objects through `cb(services)` that fulfill `role`
 If there are no such services then the callback `cb` will get queued until some
 service fulfilling `role` gets allocated.
 
-ports.service(role, cb)
------------------------
+ports.service(role, meta={}, cb)
+--------------------------------
 
 Create a service fulfilling the role of `role`.
 
@@ -126,8 +126,12 @@ Receive a callback `cb(port, ready)` with the allocated `port` and `ready()`
 function to call and re-assume the `port` every time the seaport service
 connection gets interrupted.
 
-ports.allocate(role, cb)
-------------------------
+You can optionally supply a metadata object `meta` that will be merged into the
+result objects available when you call `.get()` or `.query()`. If you supply
+`'host'` or `'port'` keys they will be overwritten.
+
+ports.allocate(role, meta={}, cb)
+---------------------------------
 
 Request a port to fulfil a `role`. `cb(port, ready)` fires with the result.
 
@@ -135,23 +139,37 @@ Call `ready()` when your service is ready to start accepting connections.
 
 If `cb.length === 1` then `ready()` will be fired automatically.
 
+You can optionally supply a metadata object `meta` that will be merged into the
+result objects available when you call `.get()` or `.query()`. If you supply
+`'host'` or `'port'` keys they will be overwritten.
+
 ports.free(port, cb)
 --------------------
 
-Give a port back. `cb()` fires when complete.
+Give a port back. `cb(alloc)` fires when complete. You will get back the `alloc`
+object that you would have gotten if you'd queried the service directly.
 
-ports.assume(role, port, cb)
-----------------------------
+ports.assume(role, port or meta={}, cb)
+---------------------------------------
 
 Dictate to the server what port you are listening on.
 This is useful for re-establishing a route without restarting the server.
+
+You can optionally supply a metadata object `meta` that will be merged into the
+result objects available when you call `.get()` or `.query()`. If you use `meta`
+you must supply `meta.port` as the port argument.
+
+Other keys used by seaport like `'host'` will be overwritten.
 
 ports.query(role, cb)
 ---------------------
 
 Get the services that satisfy the role `role` in `cb(services)`.
+Everything after the `'@'` in `role` will be treated as a semver. If the semver
+is invalid (but not undefined) the algorithm will resort to exact matches.
 
 Services are just objects that look like: `{ host : '1.2.3.4', port : 5678 }`.
+Services can also include metadata that you've given them.
 
 server methods
 ==============
