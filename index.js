@@ -55,10 +55,20 @@ exports.connect = function () {
         });
     };
     
-    self.service = function (role, fn) {
-        self.allocate(role, function (port, ready) {
+    self.service = function (role, params, fn) {
+        if (typeof role === 'object') {
+            fn = params;
+            params = role;
+            role = params.role;
+        }
+        else if (typeof params === 'function') {
+            fn = params;
+            params = {};
+        }
+        
+        self.allocate(role, params, function (port, ready) {
             up.on('up', function () {
-                self.assume(role, port);
+                self.assume(role, params, port);
             });
             
             fn(port, ready);
