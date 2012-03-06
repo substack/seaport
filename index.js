@@ -273,6 +273,11 @@ exports.createServer = function (opts) {
             if (version === undefined) {
                 return roles[role] || [];
             }
+            else if (!semver.validRange(version)) {
+                return (roles[role] || []).filter(function (r) {
+                    return version === r.version;
+                });
+            }
             else {
                 return (roles[role] || []).filter(function (r) {
                     return semver.satisfies(r.version, version);
