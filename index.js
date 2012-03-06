@@ -138,7 +138,7 @@ exports.createServer = function (opts) {
             function ready () {
                 ports[addr].push(port);
                 
-                if (params.host === undefined) params.host = addr;
+                params.host = addr;
                 params.port = port;
                 params.version = version;
                 params.role = role;
@@ -169,7 +169,7 @@ exports.createServer = function (opts) {
             }
             
             var role = roleVer.split('@')[0];
-            var version = params.version || roleVer.split('@')[1];
+            var version = params.version || roleVer.split('@')[1] || '0.0.0';
             
             var ix = ports[addr].indexOf(port);
             if (ix >= 0) ports[addr].splice(ix, 1);
@@ -180,7 +180,7 @@ exports.createServer = function (opts) {
                 return r.port !== port;
             });
             
-            params.host = params.host || addr;
+            params.host = addr;
             params.port = port;
             params.role = role;
             params.version = version;
@@ -201,8 +201,8 @@ exports.createServer = function (opts) {
             Object.keys(roles).forEach(function (role) {
                 var rs = roles[role];
                 roles[role] = rs.filter(function (r) {
-                    var x = !(r.port === port && r.host === addr);
-                    if (!x) {
+                    var x = r.port === port && r.host === addr;
+                    if (x) {
                         found = {};
                         Object.keys(r).forEach(function (key) {
                             found[key] = r[key];
@@ -211,7 +211,7 @@ exports.createServer = function (opts) {
                         if (!found.port) found.port = port;
                         found.role = role;
                     }
-                    return x;
+                    return !x;
                 });
             });
             

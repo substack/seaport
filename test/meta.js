@@ -10,11 +10,11 @@ test('allocate with metadata', function (t) {
     server.on('allocate', function (alloc) {
         t.equal(gotPort, alloc.port);
         t.equal(alloc.beep, 'boop');
-        t.equal(alloc.host, '127.1.2.3');
+        t.equal(alloc.host, '127.0.0.1', 'ignore the supplied host');
         
         ports.query('http', function (ps) {
             t.equal(ps.length, 1);
-            t.equal(ps[0].host, '127.1.2.3');
+            t.equal(ps[0].host, '127.0.0.1', 'ignore the supplied host');
             t.equal(ps[0].port, gotPort);
             t.equal(ps[0].beep, 'boop');
             ports.close();
@@ -22,6 +22,7 @@ test('allocate with metadata', function (t) {
     });
     
     server.on('free', function (alloc) {
+//console.error(alloc);
         t.equal(alloc.beep, 'boop');
         ports = seaport.connect('localhost', port);
         ports.assume('http', { port : gotPort, foo : 'bar' });
