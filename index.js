@@ -106,39 +106,47 @@ exports.createServer = function (opts) {
             });
         });
         
-        self.allocate = function (roleVer, n, cb) {
-            var role = roleVer.split('@')[0];
-            var version = roleVer.split('@')[1] || '0.0.0';
-            
-            if (typeof n === 'function') {
-                cb = n;
-                n = 1;
+        self.allocate = function (roleVer, params, cb) {
+            if (typeof roleVer === 'object') {
+                cb = params;
+                params = roleVer;
+                roleVer = params.role;
             }
+            if (typeof params === 'function') {
+                cb = params;
+                params = {};
+            }
+            
+            var role = roleVer.split('@')[0];
+            var version = params.version || roleVer.split('@')[1] || '0.0.0';
+            
             if (typeof cb !== 'function') return;
             if (!roles[role]) roles[role] = [];
             
             var r = opts.range[addr] || opts.range['*'];
             
             var port;
-            do {
-                port = Math.floor(Math.random() * (r[1] - r[0])) + r[0];
-            } while (ports[addr][port]);
+            if (params.port) {
+                port = params.port
+            }
+            else {
+                do {
+                    port = Math.floor(Math.random() * (r[1] - r[0])) + r[0];
+                } while (ports[addr][port]);
+            }
             
             function ready () {
                 ports[addr].push(port);
-                roles[role].push({
-                    host : addr,
-                    port : port,
-                    version : version,
-                });
+                
+                if (params.host === undefined) params.host = addr;
+                params.port = port;
+                params.version = version;
+                params.role = role;
+                
+                roles[role].push(params);
                 allocatedPorts.push(port);
                 
-                server.emit('allocate', {
-                    role : role,
-                    host : addr,
-                    port : port,
-                    version : version,
-                });
+                server.emit('allocate', params);
             }
             
             cb(port, ready);

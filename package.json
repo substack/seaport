@@ -33,7 +33,7 @@
         "semver" : "1.0.x"
     },
     "devDependencies" : {
-        "tap" : "0.1.x",
+        "tap" : "~0.2.3",
         "request" : "2.9.x"
     },
     "engines" : {
