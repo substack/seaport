@@ -2,7 +2,7 @@ var test = require('tap').test;
 var seaport = require('../');
 
 test('allocate with metadata', function (t) {
-    t.plan(8);
+    t.plan(12);
     var port = Math.floor(Math.random() * 5e5 + 1e5);
     var server = seaport.createServer();
     
@@ -23,13 +23,14 @@ test('allocate with metadata', function (t) {
     
     server.on('free', function () {
         ports = seaport.connect('localhost', port);
-        ports.assume('http', gotPort);
+        ports.assume('http', { port : gotPort, foo : 'bar' });
     });
     
     server.on('assume', function (alloc) {
         t.equal(alloc.port, gotPort);
-        t.equal(alloc.beep, 'boop');
-        t.equal(alloc.host, '127.1.2.3');
+        t.equal(alloc.foo, 'bar');
+        t.ok(alloc.beep === undefined);
+        t.equal(alloc.host, '127.0.0.1');
         
         ports.close();
         server.close();

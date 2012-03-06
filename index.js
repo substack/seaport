@@ -153,8 +153,23 @@ exports.createServer = function (opts) {
         };
         
         self.assume = function (roleVer, port, cb) {
+            var params = {};
+            if (typeof port === 'object') {
+                params = port;
+                port = params.port;
+            }
+            else if (typeof roleVer === 'object') {
+                params = roleVer;
+                roleVer = params.role;
+                
+                if (typeof port === 'function') {
+                    cb = port;
+                    port = params.port;
+                }
+            }
+            
             var role = roleVer.split('@')[0];
-            var version = roleVer.split('@')[1];
+            var version = params.version || roleVer.split('@')[1];
             
             var ix = ports[addr].indexOf(port);
             if (ix >= 0) ports[addr].splice(ix, 1);
@@ -164,18 +179,14 @@ exports.createServer = function (opts) {
             roles[role] = (roles[role] || []).filter(function (r) {
                 return r.port !== port;
             });
-            roles[role].push({
-                host : addr,
-                port : port,
-                version : version,
-            });
             
-            server.emit('assume', {
-                role : role,
-                host : addr,
-                port : port, 
-                version : version,
-            });
+            params.host = params.host || addr;
+            params.port = port;
+            params.role = role;
+            params.version = version;
+            roles[role].push(params);
+            
+            server.emit('assume', params);
             if (cb) cb();
         };
         
