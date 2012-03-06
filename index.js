@@ -203,19 +203,20 @@ exports.createServer = function (opts) {
                 roles[role] = rs.filter(function (r) {
                     var x = !(r.port === port && r.host === addr);
                     if (!x) {
-                        found = { role : role, version : r.version };
+                        found = {};
+                        Object.keys(r).forEach(function (key) {
+                            found[key] = r[key];
+                        });
+                        if (!found.host) found.host = addr;
+                        if (!found.port) found.port = port;
+                        found.role = role;
                     }
                     return x;
                 });
             });
             
             if (typeof cb === 'function') cb();
-            server.emit('free', {
-                role : found && found.role,
-                version : found && found.version,
-                host : addr,
-                port : port,
-            });
+            server.emit('free', found || { host : addr, port : port });
         };
         
         self.query = function (role, cb) {
