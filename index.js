@@ -22,7 +22,9 @@ exports.connect = function () {
         else conn.emit('up', remote)
     });
     
-    var up = upnode.connect.apply(null, argv.args);
+    var up = upnode({ 
+        ping : function (cb) { if (typeof cb === 'function') cb() }
+    }).connect.apply(null, argv.args);
     
     var self = new EventEmitter;
     self.up = up;
@@ -110,7 +112,21 @@ exports.createServer = function (opts) {
         }
         if (conn.stream) onready();
         
+        var iv = setInterval(function () {
+            if (typeof remote.ping === 'function') {
+                var to = setTimeout(function () {
+                    conn.end();
+                }, 10 * 1000);
+                
+                remote.ping(function () {
+                    clearTimeout(to);
+                });
+            }
+        }, 10 * 1000);
+        
         conn.on('end', function () {
+            clearInterval(iv);
+            
             allocatedPorts.forEach(function (port) {
                 self.free(port);
             });
@@ -197,7 +213,7 @@ exports.createServer = function (opts) {
             roles[role].push(params);
             
             server.emit('assume', params);
-            if (cb) cb();
+            if (typeof cb === 'function') cb();
         };
         
         self.free = function (port, cb) {
