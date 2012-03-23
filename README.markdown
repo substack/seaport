@@ -149,6 +149,10 @@ ports.free(port, cb)
 Give a port back. `cb(alloc)` fires when complete. You will get back the `alloc`
 object that you would have gotten if you'd queried the service directly.
 
+If `port` is an object, you can free ports on other services besides the
+presently connected host by passing in a `host` field in addition to a `port`
+field.
+
 ports.assume(role, port or meta={}, cb)
 ---------------------------------------
 
