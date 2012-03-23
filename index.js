@@ -216,10 +216,16 @@ exports.createServer = function (opts) {
             if (typeof cb === 'function') cb();
         };
         
-        self.free = function (port, cb) {
-            if (ports[addr]) {
-                var ix = ports[addr].indexOf(port);
-                if (ix >= 0) ports[addr].splice(ix, 1);
+        self.free = function (params, cb) {
+            if (typeof params === 'number') {
+                params = { port : params };
+            }
+            var port = params.port;
+            var host = params.host || addr;
+            
+            if (ports[host]) {
+                var ix = ports[host].indexOf(port);
+                if (ix >= 0) ports[host].splice(ix, 1);
             }
             
             var found;
@@ -227,13 +233,13 @@ exports.createServer = function (opts) {
             Object.keys(roles).forEach(function (role) {
                 var rs = roles[role];
                 roles[role] = rs.filter(function (r) {
-                    var x = r.port === port && r.host === addr;
+                    var x = r.port === port && r.host === host;
                     if (x) {
                         found = {};
                         Object.keys(r).forEach(function (key) {
                             found[key] = r[key];
                         });
-                        if (!found.host) found.host = addr;
+                        if (!found.host) found.host = host;
                         if (!found.port) found.port = port;
                         found.role = role;
                     }
@@ -242,7 +248,7 @@ exports.createServer = function (opts) {
             });
             
             if (typeof cb === 'function') cb();
-            server.emit('free', found || { host : addr, port : port });
+            server.emit('free', found);
         };
         
         self.query = function (role, cb) {

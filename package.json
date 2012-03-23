@@ -1,7 +1,7 @@
 {
     "name" : "seaport",
     "description" : "service registry and port assignment for clusters",
-    "version" : "0.6.1",
+    "version" : "0.6.2",
     "repository" : {
         "type" : "git",
         "url" : "git://github.com/substack/seaport.git"
