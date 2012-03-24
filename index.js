@@ -70,7 +70,8 @@ exports.connect = function () {
         
         self.allocate(role, params, function (port, ready) {
             up.on('up', function () {
-                self.assume(role, params, port);
+                params.port = port;
+                self.assume(role, params);
             });
             
             fn(port, ready);
