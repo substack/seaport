@@ -9,7 +9,7 @@ test('service', function (t) {
     
     var ports = [
         seaport.connect(serverPort),
-        seaport.connect(serverPort),
+        seaport.connect('localhost:' + serverPort),
     ];
     
     var t0 = Date.now();
