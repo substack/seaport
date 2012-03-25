@@ -8,7 +8,12 @@ exports.connect = function () {
         if (arg && typeof arg === 'object' && arg.secret) {
             acc.secret = arg.secret;
         }
-        acc.args.push(arg);
+        
+        if (typeof arg === 'string' && /:/.test(arg)) {
+            var s = arg.split(':');
+            acc.args.push(s[0], parseInt(s[1], 10));
+        }
+        else acc.args.push(arg);
         return acc;
     }, { args : [] });
     
