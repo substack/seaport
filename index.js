@@ -1,5 +1,4 @@
 var upnode = require('upnode');
-var dnode = require('dnode');
 var semver = require('semver');
 var EventEmitter = require('events').EventEmitter;
 
@@ -95,7 +94,7 @@ exports.createServer = function (opts) {
     if (!opts) opts = {};
     if (!opts.range) opts.range = { '*' : [ 10000, 20000 ] } ;
     
-    var server = dnode(function (remote, conn) {
+    var up = upnode(function (remote, conn) {
         if (!opts.secret) return service(remote, conn);
         
         this.auth = function (secret, cb) {
@@ -103,6 +102,20 @@ exports.createServer = function (opts) {
             else cb('ACCESS DENIED')
         };
     });
+    var server = new EventEmitter;
+    server._servers = [];
+    server.up = server;
+    
+    server.close = function () {
+        server._servers.forEach(function (s) {
+            s.close();
+        });
+    };
+    
+    server.listen = function () {
+        server._servers.push(up.listen.apply(up, arguments));
+        return server;
+    };
     
     var ports = server.ports = {};
     var roles = server.roles = {};
@@ -314,6 +327,5 @@ exports.createServer = function (opts) {
         }
     };
     
-    server.use(upnode.ping);
     return server;
 };
