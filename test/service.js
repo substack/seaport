@@ -3,7 +3,7 @@ var test = require('tap').test;
 
 test('service', function (t) {
     t.plan(4);
-    var serverPort = Math.floor(Math.random() * 5e5 + 1e5);
+    var serverPort = Math.floor(Math.random() * 5e4 + 1e4);
     var server = seaport.createServer();
     server.listen(serverPort);
     

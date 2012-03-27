@@ -3,7 +3,7 @@ var seaport = require('../');
 
 test('alloc and free', function (t) {
     t.plan(6);
-    var port = Math.floor(Math.random() * 5e5 + 1e5);
+    var port = Math.floor(Math.random() * 5e4 + 1e4);
     var server = seaport.createServer();
     
     var gotPort;
