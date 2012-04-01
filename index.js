@@ -65,7 +65,7 @@ exports.connect = function () {
         });
     }
 
-    self.cache = (new function() {
+    self.cache = (new function () {
 
         this._cache = {};
 

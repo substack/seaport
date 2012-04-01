@@ -175,6 +175,11 @@ is invalid (but not undefined) the algorithm will resort to exact matches.
 Services are just objects that look like: `{ host : '1.2.3.4', port : 5678 }`.
 Services can also include metadata that you've given them.
 
+ports.cache.query(role, cb)
+---------------------
+
+Like `ports.query` but returned a cached result if available. 
+
 server methods
 ==============
 
