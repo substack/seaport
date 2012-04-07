@@ -60,7 +60,7 @@ else {
         });
     }
     else if (cmd === 'query') {
-        var ports = seaport.connect(host, port);
+        var ports = seaport.connect(host, port, argv);
         ports.query(argv._[2], function (ps) {
             console.log(JSON.stringify(ps.map(function (p) {
                 return p.host + ':' + p.port
@@ -69,7 +69,7 @@ else {
         });
     }
     else if (cmd === 'show' || cmd === undefined) {
-        var ports = seaport.connect(host, port);
+        var ports = seaport.connect(host, port, argv);
         ports.query(function (ps) {
             console.log(JSON.stringify(ps, undefined, 2));
             ports.close();
