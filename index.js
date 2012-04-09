@@ -34,7 +34,7 @@ exports.connect = function () {
     self.up = up;
     self.close = up.close.bind(up);
     
-    [ 'free', 'query', 'assume', 'get', 'service' ]
+    [ 'free', 'query', 'assume', 'get', 'service', 'subscribe' ]
         .forEach(function (name) {
             self[name] = function () {
                 var args = [].slice.call(arguments);
@@ -45,6 +45,17 @@ exports.connect = function () {
             };
         })
     ;
+
+    // Hook into `on` method and proxy listeners for `allocate`,
+    // `assume` and `free` events to the `subscribe` method instead.
+    var origOn = self.on;
+    self.on = function () {
+        var args = [].slice.call(arguments);
+        if (["allocate", "assume", "free"].indexOf(args[0]) > -1) {
+            self.subscribe.apply(self, args);
+        }
+        else { origOn.apply(self, args); }
+    };
     
     self.allocate = function () {
         var args = [].slice.call(arguments);
@@ -87,6 +98,9 @@ exports.connect = function () {
 }
 
 exports.createServer = function (opts) {
+    // Store references to listeners added with `subscribe`
+    var clientEmitters = {allocate: [], assume: [], free: []};
+
     if (typeof opts === 'function') {
         fn = opts;
         opts = {};
@@ -105,6 +119,16 @@ exports.createServer = function (opts) {
     var server = new EventEmitter;
     server._servers = [];
     server.up = server;
+
+    // Set up remote listeners added with `subscribe`
+    ["allocate", "assume", "free"].forEach(function(eventName) {
+        server.on(eventName, function() {
+            for(var j=0; j < clientEmitters[eventName].length; j++) {
+                var emit = clientEmitters[eventName][j];
+                emit.apply(this, arguments);
+            }
+        });
+    });
     
     server.close = function () {
         server._servers.forEach(function (s) {
@@ -151,6 +175,12 @@ exports.createServer = function (opts) {
             });
         });
         
+        // Add remote listeners to the `allocate`, `assume`
+        // or `free` events.
+        self.subscribe = function (eventName, emit) {
+            clientEmitters[eventName].push(emit);
+        };
+
         self.allocate = function (roleVer, params, cb) {
             if (typeof roleVer === 'object') {
                 cb = params;
