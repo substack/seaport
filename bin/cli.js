@@ -42,8 +42,8 @@ if (typeof argv._[0] === 'number') {
 }
 else {
     var s = argv._[0].split(':');
-    var port = s[1] || s[0];
-    var host = s[1] ? s[1] : s[0];
+    var port = s[0];
+    var host = s[1];
     
     var cmd = argv._[1];
     
