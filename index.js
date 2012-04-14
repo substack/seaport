@@ -122,7 +122,7 @@ exports.createServer = function (opts) {
     
     function service (remote, conn) {
         var self = {};
-        var allocatedPorts = [];
+        var allocated = [];
         
         conn.on('ready', onready);
         function onready () {
@@ -146,8 +146,8 @@ exports.createServer = function (opts) {
         conn.on('end', function () {
             clearInterval(iv);
             
-            allocatedPorts.forEach(function (port) {
-                self.free(port);
+            allocated.forEach(function (entry) {
+                self.free(entry);
             });
         });
         
@@ -189,7 +189,7 @@ exports.createServer = function (opts) {
                 params.role = role;
                 
                 roles[role].push(params);
-                allocatedPorts.push(port);
+                allocated.push(params);
                 
                 server.emit('allocate', params);
             }
@@ -219,7 +219,6 @@ exports.createServer = function (opts) {
             var ix = ports[addr].indexOf(port);
             if (ix >= 0) ports[addr].splice(ix, 1);
             ports[addr].push(port);
-            allocatedPorts.push(port);
             
             roles[role] = (roles[role] || []).filter(function (r) {
                 return r.port !== port;
@@ -230,6 +229,7 @@ exports.createServer = function (opts) {
             params.role = role;
             params.version = version;
             roles[role].push(params);
+            allocated.push(params);
             
             server.emit('assume', params);
             if (typeof cb === 'function') cb();
