@@ -27,14 +27,18 @@ exports.connect = function () {
     });
     
     var up = upnode({ 
-        ping : function (cb) { if (typeof cb === 'function') cb() }
+        ping : function (cb) { if (typeof cb === 'function') cb() },
+        invalidateCache: function (cb) {
+            self.cache.clear();
+            if (typeof cb === 'function')  cb();
+        }
     }).connect.apply(null, argv.args);
     
     var self = new EventEmitter;
     self.up = up;
     self.close = up.close.bind(up);
     
-    [ 'free', 'query', 'assume', 'get', 'service' ]
+    [ 'free', 'assume', 'get', 'service' ]
         .forEach(function (name) {
             self[name] = function () {
                 var args = [].slice.call(arguments);
@@ -45,6 +49,46 @@ exports.connect = function () {
             };
         })
     ;
+
+    self.query = function () {
+        var args = [].slice.call(arguments);
+        var fn = args[args.length - 1];
+        if (fn.length === 1) {
+            args[args.length - 1] = function () {
+                fn.apply(null, arguments);
+                self.cache.put(args[0], arguments[0]);
+            };
+        }
+
+        up(function (remote) {
+            remote.query.apply(null, args);
+        });
+    }
+
+    self.cache = (new function () {
+
+        this._cache = {};
+
+        this.query = function (roleVer, cb) {
+            var cached = this.get(roleVer);
+            if (cached) cb(cached);
+            else self.query.apply(self, arguments);
+        }
+
+        this.put = function (roleVer, result) {
+            this._cache[roleVer] = result;
+        }
+
+        this.get = function (roleVer) {
+            return this._cache[roleVer];
+        }
+
+        this.clear = function () {
+            this._cache = {};
+            self.emit('cache.clear');
+        }
+
+    });
     
     self.allocate = function () {
         var args = [].slice.call(arguments);
@@ -142,6 +186,10 @@ exports.createServer = function (opts) {
                 });
             }
         }, 10 * 1000);
+
+        server.on('allocate', function() { remote.invalidateCache() });
+        server.on('assume', function() { remote.invalidateCache() });
+        server.on('free', function() { remote.invalidateCache() });
         
         conn.on('end', function () {
             clearInterval(iv);
