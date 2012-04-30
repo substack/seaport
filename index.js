@@ -290,7 +290,7 @@ exports.createServer = function (opts) {
             });
             
             if (typeof cb === 'function') cb();
-            server.emit('free', found);
+            if (found) server.emit('free', found);
         };
         
         self.query = function (role, cb) {
