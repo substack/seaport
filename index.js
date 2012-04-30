@@ -26,9 +26,7 @@ exports.connect = function () {
         else conn.emit('up', remote)
     });
     
-    var up = upnode({ 
-        ping : function (cb) { if (typeof cb === 'function') cb() }
-    }).connect.apply(null, argv.args);
+    var up = upnode.connect.apply(null, argv.args);
     
     var self = new EventEmitter;
     self.up = up;
@@ -119,7 +117,7 @@ exports.createServer = function (opts) {
     var server = new EventEmitter;
     server._servers = [];
     server.up = server;
-
+    
     // Set up remote listeners added with `subscribe`
     ["allocate", "assume", "free"].forEach(function(eventName) {
         server.on(eventName, function() {
@@ -155,21 +153,7 @@ exports.createServer = function (opts) {
         }
         if (conn.stream) onready();
         
-        var iv = setInterval(function () {
-            if (typeof remote.ping === 'function') {
-                var to = setTimeout(function () {
-                    conn.end();
-                }, 10 * 1000);
-                
-                remote.ping(function () {
-                    clearTimeout(to);
-                });
-            }
-        }, 10 * 1000);
-        
         conn.on('end', function () {
-            clearInterval(iv);
-            
             allocated.forEach(function (entry) {
                 self.free(entry);
             });

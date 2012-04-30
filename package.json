@@ -27,7 +27,7 @@
         "test" : "tap test/*.js"
     },
     "dependencies" : {
-        "upnode" : "~0.2.0",
+        "upnode" : "~0.2.2",
         "optimist" : "0.3.x",
         "semver" : "1.0.x"
     },
