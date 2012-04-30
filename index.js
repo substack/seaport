@@ -32,6 +32,10 @@ exports.connect = function () {
     self.up = up;
     self.close = up.close.bind(up);
     
+    up.on('up', self.emit.bind(self, 'up'));
+    up.on('down', self.emit.bind(self, 'down'));
+    up.on('reconnect', self.emit.bind(self, 'reconnect'));
+    
     [ 'free', 'query', 'assume', 'get', 'service', 'subscribe' ]
         .forEach(function (name) {
             self[name] = function () {

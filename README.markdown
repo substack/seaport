@@ -175,6 +175,20 @@ is invalid (but not undefined) the algorithm will resort to exact matches.
 Services are just objects that look like: `{ host : '1.2.3.4', port : 5678 }`.
 Services can also include metadata that you've given them.
 
+ports.on(eventName, cb)
+-----------------------
+
+Subscribe to events (`'free'`, `'allocate'`, and `'assume'`) from the remote
+seaport server. `ports` will also emit local `'up'`, `'down'`, and `'reconnect'`
+events from the upnode connection.
+
+`ports` acts like a regular EventEmitter except that data won't be sent for
+remote events until you start listening for them.
+
+Note that you won't get events while the seaport server is down so you should
+probably listen for the `'up'` event from `ports` and then call `ports.query()`
+if you are trying to keep a local cache of registry entries.
+
 server methods
 ==============
 
@@ -207,4 +221,4 @@ npm install -g seaport
 license
 =======
 
-MIT/X11
+MIT

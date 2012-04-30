@@ -22,7 +22,6 @@ test('allocate with metadata', function (t) {
     });
     
     server.on('free', function (alloc) {
-//console.error(alloc);
         t.equal(alloc.beep, 'boop');
         ports = seaport.connect('localhost', port);
         ports.assume('http', { port : gotPort, foo : 'bar' });
