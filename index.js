@@ -179,8 +179,13 @@ exports.createServer = function (opts) {
         // or `free` events.
         self.subscribe = function (eventName, emit) {
             clientEmitters[eventName].push(emit);
+            
+            conn.on('end', function () {
+                var ix = clientEmitters[eventName].indexOf(emit);
+                if (ix >= 0) clientEmitters[eventName].splice(ix, 1);
+            });
         };
-
+        
         self.allocate = function (roleVer, params, cb) {
             if (typeof roleVer === 'object') {
                 cb = params;
