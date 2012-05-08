@@ -149,11 +149,16 @@ exports.createServer = function (opts) {
     function service (remote, conn) {
         var self = {};
         var allocated = [];
-        var addr;
+        
+        var addrQueue = [];
+        var withAddr = function (cb) { addrQueue.push(cb) };
         
         conn.on('ready', onready);
         function onready () {
-            addr = conn.stream.remoteAddress;
+            var addr = conn.stream.remoteAddress;
+            withAddr = function (cb) { cb(addr) };
+            addrQueue.forEach(withAddr);
+            
             if (!ports[addr]) ports[addr] = [];
         }
         if (conn.stream) onready();
@@ -192,33 +197,35 @@ exports.createServer = function (opts) {
             if (typeof cb !== 'function') return;
             if (!roles[role]) roles[role] = [];
             
-            var r = opts.range[addr] || opts.range['*'];
-            
-            var port;
-            if (params.port) {
-                port = params.port
-            }
-            else {
-                do {
-                    port = Math.floor(Math.random() * (r[1] - r[0])) + r[0];
-                } while (ports[addr][port]);
-            }
-            
-            function ready () {
-                ports[addr].push(port);
+            withAddr(function (addr) {
+                var r = opts.range[addr] || opts.range['*'];
                 
-                params.host = addr;
-                params.port = port;
-                params.version = version;
-                params.role = role;
+                var port;
+                if (params.port) {
+                    port = params.port
+                }
+                else {
+                    do {
+                        port = Math.floor(Math.random() * (r[1] - r[0])) + r[0];
+                    } while (ports[addr][port]);
+                }
                 
-                roles[role].push(params);
-                allocated.push(params);
-                
-                server.emit('allocate', params);
-            }
+                function ready () {
+                    ports[addr].push(port);
+                    
+                    params.host = addr;
+                    params.port = port;
+                    params.version = version;
+                    params.role = role;
+                    
+                    roles[role].push(params);
+                    allocated.push(params);
+                    
+                    server.emit('allocate', params);
+                }
+                cb(port, ready);
+            });
             
-            cb(port, ready);
         };
         
         self.assume = function (roleVer, port, cb) {
@@ -240,58 +247,62 @@ exports.createServer = function (opts) {
             var role = roleVer.split('@')[0];
             var version = params.version || roleVer.split('@')[1] || '0.0.0';
             
-            var ix = ports[addr].indexOf(port);
-            if (ix >= 0) ports[addr].splice(ix, 1);
-            ports[addr].push(port);
-            
-            roles[role] = (roles[role] || []).filter(function (r) {
-                return r.port !== port;
+            withAddr(function (addr) {
+                var ix = ports[addr].indexOf(port);
+                if (ix >= 0) ports[addr].splice(ix, 1);
+                ports[addr].push(port);
+                
+                roles[role] = (roles[role] || []).filter(function (r) {
+                    return r.port !== port;
+                });
+                
+                params.host = addr;
+                params.port = port;
+                params.role = role;
+                params.version = version;
+                roles[role].push(params);
+                allocated.push(params);
+                
+                server.emit('assume', params);
+                if (typeof cb === 'function') cb();
             });
-            
-            params.host = addr;
-            params.port = port;
-            params.role = role;
-            params.version = version;
-            roles[role].push(params);
-            allocated.push(params);
-            
-            server.emit('assume', params);
-            if (typeof cb === 'function') cb();
         };
         
         self.free = function (params, cb) {
             if (typeof params === 'number') {
                 params = { port : params };
             }
-            var port = params.port;
-            var host = params.host || addr;
-            
-            if (ports[host]) {
-                var ix = ports[host].indexOf(port);
-                if (ix >= 0) ports[host].splice(ix, 1);
-            }
-            
-            var found;
-            
-            Object.keys(roles).forEach(function (role) {
-                var rs = roles[role];
-                roles[role] = rs.filter(function (r) {
-                    var x = r.port === port && r.host === host;
-                    if (x) {
-                        found = {};
-                        Object.keys(r).forEach(function (key) {
-                            found[key] = r[key];
-                        });
-                        if (!found.host) found.host = host;
-                        if (!found.port) found.port = port;
-                        found.role = role;
-                    }
-                    return !x;
+            withAddr(function (addr) {
+                var port = params.port;
+                var host = params.host || addr;
+                
+                if (ports[host]) {
+                    var ix = ports[host].indexOf(port);
+                    if (ix >= 0) ports[host].splice(ix, 1);
+                }
+                
+                var found;
+                
+                Object.keys(roles).forEach(function (role) {
+                    var rs = roles[role];
+                    roles[role] = rs.filter(function (r) {
+                        var x = r.port === port && r.host === host;
+                        if (x) {
+                            found = {};
+                            Object.keys(r).forEach(function (key) {
+                                found[key] = r[key];
+                            });
+                            if (!found.host) found.host = host;
+                            if (!found.port) found.port = port;
+                            found.role = role;
+                        }
+                        return !x;
+                    });
                 });
-            });
             
-            if (typeof cb === 'function') cb();
-            if (found) server.emit('free', found);
+                if (typeof cb === 'function') cb();
+                if (found) server.emit('free', found);
+            });
         };
         
         self.query = function (role, cb) {
