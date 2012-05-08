@@ -253,7 +253,7 @@ exports.createServer = function (opts) {
                 ports[addr].push(port);
                 
                 roles[role] = (roles[role] || []).filter(function (r) {
-                    return r.port !== port;
+                    return !(r.host === addr && r.port === port);
                 });
                 
                 params.host = addr;
