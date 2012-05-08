@@ -149,6 +149,7 @@ exports.createServer = function (opts) {
     function service (remote, conn) {
         var self = {};
         var allocated = [];
+        var addr;
         
         conn.on('ready', onready);
         function onready () {
