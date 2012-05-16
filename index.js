@@ -48,9 +48,10 @@ exports.connect = function () {
         })
     ;
 
-    self.subscribe = function(eventName, cb) {
-        up.on('up', function () {
-            up.remote.subscribe(eventName, cb);
+    self.subscribe = function (eventName, cb) {
+        if (up.remote) up.remote.subscribe(eventName, cb);
+        up.on('up', function (remote) {
+            remote.subscribe(eventName, cb);
         });
     };
 

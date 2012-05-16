@@ -1,20 +1,22 @@
 var seaport = require('../');
 var test = require('tap').test;
 
-test('resubscribe if connection dies', function(t) {
+test('resubscribe with delayed subscription', function(t) {
     var serverPort = Math.floor(Math.random() * 5e4 + 1e4);
     var server = seaport.createServer();
     var client = seaport.connect('localhost:' + serverPort, {reconnect: 10});
     
     t.plan(6);
-
+    
     var eventNames = ['allocate', 'assume', 'free'];
 
-    eventNames.forEach(function(eventName) {
-        client.subscribe(eventName, function() {
-            t.ok(true, eventName + ' emitted');
+    setTimeout(function () {
+        eventNames.forEach(function(eventName) {
+            client.subscribe(eventName, function() {
+                t.ok(true, eventName + ' emitted');
+            });
         });
-    });
+    }, 100);
 
     function emit() {
         eventNames.forEach(function(eventName) {
@@ -31,7 +33,7 @@ test('resubscribe if connection dies', function(t) {
     setTimeout(function() {
         client.up.conn.stream.end();
     }, 400);
-    
+
     // Run second test
     setTimeout(emit, 1600);
 
