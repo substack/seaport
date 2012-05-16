@@ -36,7 +36,7 @@ exports.connect = function () {
     up.on('down', self.emit.bind(self, 'down'));
     up.on('reconnect', self.emit.bind(self, 'reconnect'));
     
-    [ 'free', 'query', 'assume', 'get', 'service', 'subscribe' ]
+    [ 'free', 'query', 'assume', 'get', 'service' ]
         .forEach(function (name) {
             self[name] = function () {
                 var args = [].slice.call(arguments);
@@ -47,6 +47,12 @@ exports.connect = function () {
             };
         })
     ;
+
+    self.subscribe = function(eventName, cb) {
+        up.on('up', function () {
+            up.remote.subscribe(eventName, cb);
+        });
+    };
 
     // Hook into `on` method and proxy listeners for `allocate`,
     // `assume` and `free` events to the `subscribe` method instead.
