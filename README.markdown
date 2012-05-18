@@ -3,6 +3,8 @@ seaport
 
 service registry and port assignment for clusters
 
+[![build status](https://secure.travis-ci.org/substack/seaport.png)](http://travis-ci.org/substack/seaport)
+
 ![crane](http://substack.net/images/crane.png)
 
 example
