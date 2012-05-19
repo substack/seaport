@@ -127,7 +127,7 @@ exports.createServer = function (opts) {
     });
     var server = new EventEmitter;
     server._servers = [];
-    server.up = server;
+    server.up = up;
     
     // Set up remote listeners added with `subscribe`
     ["allocate", "assume", "free"].forEach(function(eventName) {
