@@ -1,5 +1,6 @@
 var upnode = require('upnode');
 var semver = require('semver');
+var identifier = require('identifier');
 var EventEmitter = require('events').EventEmitter;
 
 exports.connect = function () {
@@ -224,7 +225,8 @@ exports.createServer = function (opts) {
                     params.port = port;
                     params.version = version;
                     params.role = role;
-                    
+                    params._id = identifier(16);
+
                     roles[role].push(params);
                     allocated.push(params);
                     
@@ -267,6 +269,7 @@ exports.createServer = function (opts) {
                 params.port = port;
                 params.role = role;
                 params.version = version;
+                params._id = identifier(16);
                 roles[role].push(params);
                 allocated.push(params);
                 
@@ -282,6 +285,7 @@ exports.createServer = function (opts) {
             withAddr(function (addr) {
                 var port = params.port;
                 var host = params.host || addr;
+                var id = params._id;
                 
                 if (ports[host]) {
                     var ix = ports[host].indexOf(port);
@@ -293,7 +297,7 @@ exports.createServer = function (opts) {
                 Object.keys(roles).forEach(function (role) {
                     var rs = roles[role];
                     roles[role] = rs.filter(function (r) {
-                        var x = r.port === port && r.host === host;
+                        var x = r.port === port && r.host === host && r._id === id;
                         if (x) {
                             found = {};
                             Object.keys(r).forEach(function (key) {
