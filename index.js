@@ -1,6 +1,5 @@
 var upnode = require('upnode');
 var semver = require('semver');
-var identifier = require('identifier');
 var EventEmitter = require('events').EventEmitter;
 
 exports.connect = function () {
@@ -225,7 +224,7 @@ exports.createServer = function (opts) {
                     params.port = port;
                     params.version = version;
                     params.role = role;
-                    params._id = identifier(16);
+                    params._id = Math.random().toString(16).slice(2);
 
                     roles[role].push(params);
                     allocated.push(params);
@@ -269,7 +268,7 @@ exports.createServer = function (opts) {
                 params.port = port;
                 params.role = role;
                 params.version = version;
-                params._id = identifier(16);
+                params._id = Math.random().toString(16).slice(2);
                 roles[role].push(params);
                 allocated.push(params);
                 
