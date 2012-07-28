@@ -304,6 +304,9 @@ exports.createServer = function (opts) {
                     roles[role] = rs.filter(function (r) {
                         var x = r.port === port && r.host === host && r._id === id;
                         if (x) {
+                            var ix = allocated.indexOf(r);
+                            if (ix >= 0) allocated.splice(ix, 1);
+                            
                             found = {};
                             Object.keys(r).forEach(function (key) {
                                 found[key] = r[key];
