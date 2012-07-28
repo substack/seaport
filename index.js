@@ -128,6 +128,7 @@ exports.createServer = function (opts) {
     var server = new EventEmitter;
     server._servers = [];
     server.up = up;
+    server.allocated = {};
     
     // Set up remote listeners added with `subscribe`
     ["allocate", "assume", "free"].forEach(function(eventName) {
@@ -163,6 +164,8 @@ exports.createServer = function (opts) {
         conn.on('ready', onready);
         function onready () {
             var addr = conn.stream.remoteAddress;
+            server.allocated[addr] = allocated;
+            
             withAddr = function (cb) { cb(addr) };
             addrQueue.forEach(withAddr);
             
@@ -171,8 +174,11 @@ exports.createServer = function (opts) {
         if (conn.stream) onready();
         
         conn.on('end', function () {
-            allocated.forEach(function (entry) {
+            allocated.slice().forEach(function (entry) {
                 self.free(entry);
+            });
+            withAddr(function (addr) {
+                delete server.allocated[addr];
             });
         });
         
