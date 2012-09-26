@@ -358,7 +358,7 @@ exports.createServer = function (opts) {
     }
     
     server.query = function (roleVer) {
-        if (roleVer === undefined) {
+        if (!roleVer) {
             return roles;
         }
         else {
