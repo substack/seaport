@@ -1,7 +1,7 @@
 {
     "name" : "seaport",
     "description" : "service registry and port assignment for clusters",
-    "version" : "0.7.8",
+    "version" : "0.8.1",
     "repository" : {
         "type" : "git",
         "url" : "git://github.com/substack/seaport.git"
@@ -27,12 +27,12 @@
         "test" : "tap test/*.js"
     },
     "dependencies" : {
-        "upnode" : "~0.2.2",
+        "upnode" : "~0.3.1",
         "optimist" : "0.3.x",
         "semver" : "1.0.x"
     },
     "devDependencies" : {
-        "tap" : "~0.2.3",
+        "tap" : "~0.2.6",
         "request" : "2.9.x"
     },
     "engines" : {
