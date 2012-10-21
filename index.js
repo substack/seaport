@@ -302,7 +302,9 @@ exports.createServer = function (opts) {
                 Object.keys(roles).forEach(function (role) {
                     var rs = roles[role];
                     roles[role] = rs.filter(function (r) {
-                        var x = r.port === port && r.host === host && r._id === id;
+                        // if no id passed into free, don't consider it
+                        var idCondition = (!id || r._id === id);
+                        var x = r.port === port && r.host === host && idCondition;
                         if (x) {
                             var ix = allocated.indexOf(r);
                             if (ix >= 0) allocated.splice(ix, 1);
