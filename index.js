@@ -305,6 +305,7 @@ exports.createServer = function (opts) {
                         // if no id passed into free, don't consider it
                         var idCondition = (!id || r._id === id);
                         var x = r.port === port && r.host === host && idCondition;
+                        
                         if (x) {
                             var ix = allocated.indexOf(r);
                             if (ix >= 0) allocated.splice(ix, 1);
