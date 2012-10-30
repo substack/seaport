@@ -12,3 +12,7 @@ server.on('free', function (free) {
 });
 
 server.listen(9090);
+
+setInterval(function () {
+    console.dir(server.query());
+}, 1000);

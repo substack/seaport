@@ -1,5 +1,5 @@
 var seaport = require('../../');
-var ports = seaport.connect('localhost', 9090, { secret : 'beep boop' });
+var ports = seaport.connect('localhost', 9090);
 var request = require('request');
 
 ports.get('web@1.2.x', function (ps) {

@@ -1,5 +1,5 @@
 var seaport = require('../../');
-var ports = seaport.connect('localhost', 9090, { secret : 'beep boop' });
+var ports = seaport.connect('localhost', 9090);
 var http = require('http');
 
 var server = http.createServer(function (req, res) {
