@@ -12,6 +12,11 @@ exports.connect = function (port, host) {
     var s = seaport();
     var c = net.connect.apply(null, arguments);
     c.pipe(s.createStream()).pipe(c);
+    
+    s.close = function () {
+        c.end();
+    };
+    
     return s;
 };
 
@@ -21,5 +26,6 @@ exports.createServer = function () {
         c.pipe(s.createStream(c.address().address)).pipe(c);
     });
     s.listen = s.server.listen.bind(s.server);
+    s.close = s.server.close.bind(s.server);
     return s;
 };
