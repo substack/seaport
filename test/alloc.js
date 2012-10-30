@@ -7,7 +7,7 @@ test('alloc and free', function (t) {
     var server = seaport.createServer();
     
     var gotPort;
-    server.on('allocate', function (alloc) {
+    server.once('allocate', function (alloc) {
         t.equal(gotPort, alloc.port);
         
         ports.query('http', function (ps) {
@@ -20,18 +20,18 @@ test('alloc and free', function (t) {
     
     server.on('free', function () {
         ports = seaport.connect('localhost', port);
-        ports.assume('http', gotPort);
-    });
-    
-    server.on('assume', function (alloc) {
-        t.equal(alloc.port, gotPort);
         
-        ports.close();
-        server.close();
-        t.end();
-        setTimeout(function () {
-            process.exit(); // whatever
-        }, 100);
+        server.once('allocate', function (alloc) {
+            t.equal(alloc.port, gotPort);
+            
+            ports.close();
+            server.close();
+            t.end();
+            setTimeout(function () {
+                process.exit(); // whatever
+            }, 100);
+        });
+        ports.allocate('http', gotPort);
     });
     
     server.listen(port);
