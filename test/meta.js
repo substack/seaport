@@ -24,10 +24,10 @@ test('allocate with metadata', function (t) {
     server.on('free', function (alloc) {
         t.equal(alloc.beep, 'boop');
         ports = seaport.connect('localhost', port);
-        ports.assume('http', { port : gotPort, foo : 'bar' });
+        ports.allocate('http', { port : gotPort, foo : 'bar' });
     });
     
-    server.on('assume', function (alloc) {
+    server.on('allocate', function (alloc) {
         t.equal(alloc.port, gotPort);
         t.equal(alloc.foo, 'bar');
         t.ok(alloc.beep === undefined);
