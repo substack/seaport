@@ -4,18 +4,34 @@ var seaport = require('./lib/seaport');
 exports = module.exports = seaport;
 
 exports.connect = function (port, host) {
+    var args = arguments;
     if (typeof port === 'string' && typeof host === 'number') {
-        arguments[0] = host;
-        arguments[1] = port;
+        args[0] = host;
+        args[1] = port;
     }
     
     var s = seaport();
-    var c = net.connect.apply(null, arguments);
-    c.pipe(s.createStream()).pipe(c);
+    var closed = false;
     
+    var c;
     s.close = function () {
+        closed = true;
         c.end();
     };
+    
+    (function reconnect () {
+        c = net.connect.apply(null, args);
+        c.pipe(s.createStream()).pipe(c);
+        c.on('error', function (err) {
+            if (closed) return;
+            setTimeout(reconnect, 1000);
+        });
+        
+        c.on('close', function () {
+            if (closed) return;
+            setTimeout(reconnect, 1000);
+        });
+    })();
     
     return s;
 };
