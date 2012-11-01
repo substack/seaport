@@ -18,24 +18,22 @@ exports.connect = function (port, host) {
     }
     
     var s = seaport();
-    var closed = false;
-    
     var c;
-    s.close = function () {
-        closed = true;
-        c.end();
-    };
+    
+    s.on('close', function () {
+        if (c) c.end();
+    });
     
     (function reconnect () {
         c = net.connect.apply(null, args);
         c.pipe(s.createStream()).pipe(c);
         c.on('error', function (err) {
-            if (closed) return;
+            if (s.closed) return;
             setTimeout(reconnect, 1000);
         });
         
         c.on('close', function () {
-            if (closed) return;
+            if (s.closed) return;
             setTimeout(reconnect, 1000);
         });
     })();
