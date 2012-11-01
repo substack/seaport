@@ -3,7 +3,7 @@ var seaport = require('../');
 
 // same exact test as free.js but passing ports.free a number parameter
 test('free', function (t) {
-    t.plan(6);
+    t.plan(5);
     var port = Math.floor(Math.random() * 5e4 + 1e4);
     var server = seaport.createServer();
     server.listen(port);
@@ -12,11 +12,10 @@ test('free', function (t) {
     var gotPort, gotRec;
     server.on('free', function (rec) {
         t.same(rec, gotRec);
-        t.same(server.allocated[gotRec.host], []);
         ports.close();
     });
     
-    ports.allocate('http', function (p) {
+    ports.register('http', function (p) {
         t.ok(p >= 10000 && p < 65536);
         gotPort = p;
         

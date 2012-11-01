@@ -10,7 +10,7 @@ test("subscribing to server events", function (t) {
     server.listen(serverPort);
     t.plan(3);
 
-    client.on("allocate", function(data) { 
+    client.on("register", function(data) { 
         t.equal(data.port, allocatedPort, "event is fired with allocated port");
     });
 
