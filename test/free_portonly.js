@@ -20,14 +20,13 @@ test('free', function (t) {
         gotPort = p;
 
         process.nextTick(function () {
-            ports.query('http', function (ps) {
-                t.equal(ps.length, 1);
-                t.equal(ps[0].host, '127.0.0.1');
-                t.equal(ps[0].port, gotPort);
+            var ps = ports.query('http');
+            t.equal(ps.length, 1);
+            t.equal(ps[0].host, '127.0.0.1');
+            t.equal(ps[0].port, gotPort);
 
-                gotRec = ps[0];
-                ports.free(ps[0].port);
-            });
+            gotRec = ps[0];
+            ports.free(ps[0].port);
         });
     });
 

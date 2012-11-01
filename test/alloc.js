@@ -10,12 +10,11 @@ test('alloc and free', function (t) {
     server.once('allocate', function (alloc) {
         t.equal(gotPort, alloc.port);
         
-        ports.query('http', function (ps) {
-            t.equal(ps.length, 1);
-            t.equal(ps[0].host, '127.0.0.1');
-            t.equal(ps[0].port, gotPort);
-            ports.close();
-        });
+        var ps = ports.query('http');
+        t.equal(ps.length, 1);
+        t.equal(ps[0].host, '127.0.0.1');
+        t.equal(ps[0].port, gotPort);
+        ports.close();
     });
     
     server.on('free', function () {
