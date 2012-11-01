@@ -37,8 +37,6 @@ test('alloc and free', function (t) {
     
     var ports = seaport.connect('localhost', port);
     
-    ports.register('http', function (p) {
-        t.ok(p >= 10000 && p < 65536);
-        gotPort = p;
-    });
+    gotPort = ports.register('http');
+    t.ok(gotPort >= 10000 && gotPort < 65536);
 });
