@@ -43,11 +43,11 @@ test('allocate with metadata', function (t) {
     server.listen(port);
     
     var ports = seaport.connect('localhost', port);
-    ports.register(
-        { role : 'http', beep : 'boop', host : '127.1.2.3' },
-        function (p) {
-            t.ok(p >= 10000 && p < 65536);
-            gotPort = p;
-        }
-    );
+    var p = ports.register({
+        role : 'http',
+        beep : 'boop',
+        host : '127.1.2.3'
+    });
+    t.ok(p >= 10000 && p < 65536);
+    gotPort = p;
 });
