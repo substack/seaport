@@ -37,7 +37,7 @@ test('versions', function (t) {
                 [ ports_['beep@1.2.3'], ports_['beep@1.3.5'] ].sort()
             );
         });
-    }, 50);
+    }, 150);
     
     t.on('end', function () {
         server.close();
