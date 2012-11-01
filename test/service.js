@@ -23,7 +23,7 @@ test('service', function (t) {
     var gotPort;
     setTimeout(function () {
         gotPort = ports[1].register('woo');
-    }, 50);
+    }, 2000);
     
     t.on('end', function () {
         server.close();

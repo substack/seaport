@@ -9,6 +9,10 @@ exports.connect = function (port, host) {
         args[0] = host;
         args[1] = port;
     }
+    if (typeof port === 'string' && /:/.test(port)) {
+        host = port.split(':')[0];
+        port = port.split(':')[1];
+    }
     
     var s = seaport();
     var closed = false;
