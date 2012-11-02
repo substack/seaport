@@ -40,9 +40,11 @@ exports.connect = function () {
         var c = net.connect.call(null, port, host);
         var active = true;
         
-        c.on('end', onend);
-        c.on('error', onend);
-        c.on('close', onend);
+        c.once('connect', s.emit.bind(s, 'connect'));
+        
+        c.once('end', onend);
+        c.once('error', onend);
+        c.once('close', onend);
         
         c.pipe(s.createStream()).pipe(c);
         
@@ -52,6 +54,7 @@ exports.connect = function () {
             if (s.closed) return;
             if (!active) return;
             active = false;
+            s.emit('disconnect');
             setTimeout(reconnect, 1000);
         }
     })();
@@ -75,6 +78,9 @@ exports.createServer = function (opts) {
     s.on('close', function () {
         s.server.close();
     });
+    
+    s.server.on('listening', s.emit.bind(s, 'listening'));
+    s.server.on('connection', s.emit.bind(s, 'connection'));
     
     return s;
 };
