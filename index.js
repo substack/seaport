@@ -5,6 +5,10 @@ exports = module.exports = function () {
     return seaport.apply(this, arguments);
 };
 
+Object.keys(seaport).forEach(function (key) {
+    exports[key] = seaport[key];
+});
+
 exports.connect = function () {
     var args = [].slice.call(arguments);
     var opts = {};
