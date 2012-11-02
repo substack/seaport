@@ -17,7 +17,6 @@ test('update meta params at runtime', function (t) {
         ports[1].close();
     });
     
-    var t0 = Date.now();
     var port = ports[1].register('woo', { beep : 'boop' });
     ports[0].get('woo', function (ps) {
         t.equal(ps.length, 1);

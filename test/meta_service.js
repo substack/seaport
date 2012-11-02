@@ -12,13 +12,11 @@ test('meta params in a service', function (t) {
         seaport.connect(serverPort),
     ];
     
-    var t0 = Date.now();
     ports[0].get('woo', function (ps) {
         t.equal(ps.length, 1);
         t.equal(ps[0].host, '127.0.0.1');
         t.equal(ps[0].port, gotPort);
         t.equal(ps[0].beep, 'boop');
-        t.end();
     });
     
     var gotPort;
