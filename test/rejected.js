@@ -26,7 +26,7 @@ test('reject unauthorized hosts', function (t) {
         t.fail('registered when it should have been rejected');
     });
     
-    var ports = seaport.connect(server.address().port);
+    var ports = seaport.connect(server.address().port, keys[0]);
     ports.on('reject', function (rejected) {
         t.equal(port, rejected);
     });
