@@ -1,12 +1,12 @@
 usage:
 
-  seaport listen PORT OPTIONS
+  seaport listen PORT [KEY.json, ...]
 
     Create a seaport server on PORT.
-
-    OPTIONS
- 
-      --authorize KEY.json    Load authorized keys from KEY.json.
+    Optionally load authorized public keys from json files.
+    
+    Key files of arrays are expected to be PEM public key lists.
+    Key files are otherwise expected to have public and private fields.
 
   seaport show HOST:PORT
 
@@ -16,8 +16,13 @@ usage:
 
     Run a query for PATTERN against the server running at HOST:PORT.
 
-  seaport register NAME@VERSION -- [COMMAND...]
+  seaport register HOST:PORT NAME@VERSION {OPTIONS} -- [COMMAND...]
 
     Register a service. COMMAND will get an assigned port to use as
     its last argument. If COMMAND exits it will be restarted.
+    
+    OPTIONS:
+    
+    --key=key.json    Load a public/private PEM keypair from key.json.
+    --meta.KEY=...    Set json metadata on the service record.
  

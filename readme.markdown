@@ -140,34 +140,6 @@ $ curl -H 'Host: unstable' localhost:5000
 version 0.1.0
 ```
 
-# command-line usage
-
-```
-usage:
-
-  seaport listen PORT OPTIONS
-
-    Create a seaport server on PORT.
-
-    OPTIONS
- 
-      --authorize KEY.json    Load authorized keys from KEY.json.
-
-  seaport show HOST:PORT
-
-    Show the seaport records for the server running at HOST:PORT.
-
-  seaport query HOST:PORT PATTERN
-
-    Run a query for PATTERN against the server running at HOST:PORT.
-
-  seaport register NAME@VERSION -- [COMMAND...]
-
-    Register a service. COMMAND will get an assigned port to use as
-    its last argument. If COMMAND exits it will be restarted.
- 
-```
-
 # methods
 
 ```
@@ -189,6 +161,9 @@ To set an initial list of authorized keys which are allowed to make updates,
 pass `opts.authorized` as an array of PEM-encoded public key strings.
 
 When the authorized key list is empty, all connected nodes may make updates.
+
+Consider using [rsa-json](https://github.com/substack/rsa-json) to generate
+the keypairs.
 
 ## var s = seaport.connect(..., opts)
 
@@ -291,6 +266,38 @@ Emitted when a connection established by `seaport.connect()` drops.
 ## s.on('close', function () {})
 
 The `'close'` event fires when `s.close()` is called.
+
+# command-line usage
+
+```
+usage:
+
+  seaport listen PORT [KEY.json, ...]
+
+    Create a seaport server on PORT.
+    Optionally load authorized public keys from json files.
+    
+    Key files of arrays are expected to be PEM public key lists.
+    Key files are otherwise expected to have public and private fields.
+
+  seaport show HOST:PORT
+
+    Show the seaport records for the server running at HOST:PORT.
+
+  seaport query HOST:PORT PATTERN
+
+    Run a query for PATTERN against the server running at HOST:PORT.
+
+  seaport register HOST:PORT NAME@VERSION {OPTIONS} -- [COMMAND...]
+
+    Register a service. COMMAND will get an assigned port to use as
+    its last argument. If COMMAND exits it will be restarted.
+    
+    OPTIONS:
+    
+    --key=key.json    Load a public/private PEM keypair from key.json.
+    --meta.KEY=...    Set json metadata on the service record.
+```
 
 # install
 
