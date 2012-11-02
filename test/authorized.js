@@ -24,7 +24,7 @@ function makePair () {
 
 var keys = [ makePair(), makePair() ];
 
-test('reject unauthorized hosts', function (t) {
+test('allow authorized hosts', function (t) {
     t.plan(2);
     
     var server = seaport.createServer({
@@ -41,7 +41,7 @@ test('reject unauthorized hosts', function (t) {
     
     var ports = seaport.connect(server.address().port, keys[1]);
     ports.once('reject', function (from, msg) {
-        t.fail('message rejected');
+        t.fail('message from ' + from + ' rejected');
         t.end();
     });
     
