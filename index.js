@@ -66,8 +66,11 @@ exports.createServer = function (opts) {
         c.pipe(s.createStream(c.address().address)).pipe(c);
     });
     s.listen = s.server.listen.bind(s.server);
+    s.address = s.server.address.bind(s.server);
+    
     s.on('close', function () {
         s.server.close();
     });
+    
     return s;
 };
