@@ -40,11 +40,11 @@ exports.connect = function () {
         var c = net.connect.call(null, port, host);
         var active = true;
         
-        c.once('connect', s.emit.bind(s, 'connect'));
+        c.on('connect', s.emit.bind(s, 'connect'));
         
-        c.once('end', onend);
-        c.once('error', onend);
-        c.once('close', onend);
+        c.on('end', onend);
+        c.on('error', onend);
+        c.on('close', onend);
         
         c.pipe(s.createStream()).pipe(c);
         
