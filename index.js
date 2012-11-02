@@ -6,7 +6,16 @@ exports = module.exports = function () {
 };
 
 exports.connect = function (port, host) {
-    var args = arguments;
+    var args = [].slice.call(arguments);
+    var opts = {};
+    for (var i = 0; i < args.length; i++) {
+        if (typeof args[i] === 'object') {
+            opts = args[i];
+            args.splice(i, 1);
+            break;
+        }
+    }
+    
     if (typeof port === 'string' && typeof host === 'number') {
         args[0] = host;
         args[1] = port;
@@ -19,7 +28,7 @@ exports.connect = function (port, host) {
         port = Number(port);
     }
     
-    var s = seaport();
+    var s = seaport(opts);
     var c = (function reconnect () {
         if (s.closed) return;
         var c = net.connect.apply(null, args);
@@ -48,8 +57,9 @@ exports.connect = function (port, host) {
     return s;
 };
 
-exports.createServer = function () {
-    var s = seaport();
+exports.createServer = function (opts) {
+    var s = seaport(opts);
+    
     s.server = net.createServer(function (c) {
         c.pipe(s.createStream(c.address().address)).pipe(c);
     });
