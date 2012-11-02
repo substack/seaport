@@ -33,6 +33,9 @@
         "crdt" : "~3.1.4",
         "through" : "~1.1.1"
     },
+    "engine" : {
+        "node" : ">=0.8"
+    },
     "devDependencies" : {
         "tap" : "~0.3.0"
     },
