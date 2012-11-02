@@ -178,82 +178,119 @@ All the parameters that take a `role` parameter can be intelligently versioned
 with [semvers](https://github.com/isaacs/node-semver) by specifying a version in
 the `role` parameter after an `'@'` character.
 
-## var ports = seaport.connect(...)
+## var s = seaport(opts)
 
-Connect to the seaport service at `...`.
+Create a new seaport instance.
 
-## ports.get(role, cb)
+To sign your messages, specify `opts.private` and `opts.public` as PEM-encoded
+strings.
 
-Request an array of host/port objects through `cb(services)` that fulfill `role`.
+To set an initial list of authorized keys which are allowed to make updates,
+pass `opts.authorized` as an array of PEM-encoded public key strings.
 
-If there are no such services then the callback `cb` will get queued until some
-service fulfilling `role` gets allocated.
+When the authorized key list is empty, all connected nodes may make updates.
 
-## ports.service(role, meta={}, cb)
+## var s = seaport.connect(..., opts)
 
-Create a service fulfilling the role of `role`.
+Create a seaport instance piped to a tcp connection at `...`.
 
-Receive a callback `cb(port, ready)` with the allocated `port` and `ready()`
-function to call and re-assume the `port` every time the seaport service
-connection gets interrupted.
+If the server at `...` is not available or the connection drops, the connection
+is retried every second.
 
-You can optionally supply a metadata object `meta` that will be merged into the
-result objects available when you call `.get()` or `.query()`. If you supply
-`'host'` or `'port'` keys they will be overwritten.
+## var s = seaport.createServer(opts)
 
-## ports.allocate(role, meta={}, cb)
+Create a seaport instance with an attached tcp server with `.listen()` and
+`.address()` methods that will set up streams in "server mode" for incoming tcp
+connections.
 
-Request a port to fulfil a `role`. `cb(port, ready)` fires with the result.
+## s.createStream(host)
 
-Call `ready()` when your service is ready to start accepting connections.
+Create a duplex stream of the underlying
+[crdt](https://github.com/dominictarr/crdt) object.
 
-If `cb.length === 1` then `ready()` will be fired automatically.
+If `host` is specified, seaport goes into "server mode" where it stores the
+`host` value on the network for the remote endpoint's node id.
 
-You can optionally supply a metadata object `meta` that will be merged into the
-result objects available when you call `.get()` or `.query()`. If you supply
-`'host'` or `'port'` keys they will be overwritten.
+## var port = s.register(role, opts)
 
-## ports.free(port, cb)
+Register the service described by the string `role`
+(name@verion, version optional). Return the port to use for the service.
 
-Give a port back. `cb(alloc)` fires when complete. You will get back the `alloc`
-object that you would have gotten if you'd queried the service directly.
+Registrations are valid so long as the connection to the seaport server is still
+alive. When the connection to the seaport server goes down, all registrations
+are freed.
 
-If `port` is an object, you can free ports on other services besides the
-presently connected host by passing in a `host` field in addition to a `port`
-field.
+You can optionally store whatever other records you want on the service by
+putting those keys in `opts`.
 
-## ports.assume(role, port or meta={}, cb)
+If `opts.port` is specified, return and store that value for the service port.
+Otherwise a random available port is chosen. If you want to specify a valid
+range for ports to be, set `opts.range` (default: `[ 10000, 65535 ]`).
 
-Dictate to the server what port you are listening on.
-This is useful for re-establishing a route without restarting the server.
+If you don't want you specify `role` you can also use `opts.role` and
+`opts.version`.
 
-You can optionally supply a metadata object `meta` that will be merged into the
-result objects available when you call `.get()` or `.query()`. If you use `meta`
-you must supply `meta.port` as the port argument.
+## var services = s.query(search)
 
-Other keys used by seaport like `'host'` will be overwritten.
+Query the seaport entries with `search` as a `name@semver` string.
+The `@semver` part is optional and all the usual semver pattern matching
+applies.
 
-## ports.query(role, cb)
+Returns an array of all the matching services for `search`.
 
-Get the services that satisfy the role `role` in `cb(services)`.
-Everything after the `'@'` in `role` will be treated as a semver. If the semver
-is invalid (but not undefined) the algorithm will resort to exact matches.
+If `search` is `undefined`, all the records are returned.
 
-Services are just objects that look like: `{ host : '1.2.3.4', port : 5678 }`.
-Services can also include metadata that you've given them.
+## s.get(role, cb)
 
-## ports.on(eventName, cb)
+Like `.query()`, but does `cb(services)` with the list of matching entries.
+If `services` is empty, `cb` won't fire until there is at least one match
+available.
 
-Subscribe to events (`'free'`, `'allocate'`, and `'assume'`) from the remote
-seaport server. `ports` will also emit local `'up'`, `'down'`, and `'reconnect'`
-events from the upnode connection.
+## s.free(service), s.free(id)
 
-`ports` acts like a regular EventEmitter except that data won't be sent for
-remote events until you start listening for them.
+Remove a service registered with `.register()`. You can remove a service by the
+`service` object itself or just its `id`.
 
-Note that you won't get events while the seaport server is down so you should
-probably listen for the `'up'` event from `ports` and then call `ports.query()`
-if you are trying to keep a local cache of registry entries.
+## s.authorize(publicKey)
+
+Authorize the PEM-encoded `publicKey` string to make updates.
+Updates include registering services and setting keys.
+
+## s.close()
+
+Close a seaport connection or server. Cancel any pending requests.
+
+# events
+
+## s.on('register', function (service) {})
+
+Emitted whenever any node registers a new service.
+
+## s.on('free', function (service) {})
+
+Emitted whenever any node frees a service that was previously registered.
+
+## s.on('host', function (host) {})
+
+In non-server mode, the client will receive notification from the server what
+its `host` is on the network.
+
+## s.on('reject', function (key, value, timestamp, source, sig) {})
+
+Emitted when key signing fails or when a node tries to send update but is not in
+the authorized key list.
+
+## s.on('connect', function () {})
+
+Emitted when a connection is established with `seaport.connect()`.
+
+## s.on('disconnect', function () {})
+
+Emitted when a connection established by `seaport.connect()` drops.
+
+## s.on('close', function () {})
+
+The `'close'` event fires when `s.close()` is called.
 
 # install
 
