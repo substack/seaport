@@ -1,23 +1,25 @@
-seaport
-=======
+# seaport
 
 service registry and port assignment for clusters
 
 [![build status](https://secure.travis-ci.org/substack/seaport.png)](http://travis-ci.org/substack/seaport)
 
+Seaport stores `(host,port)` combos (and other metadata) for you so you won't
+need to spend so much effort keeping configuration files current as your
+architecture grows to span many processes on many machines. Just register your
+services with seaport and then query seaport to see where your services are
+running.
+
 ![crane](http://substack.net/images/crane.png)
 
-example
-=======
+# example
 
-simple service
---------------
+## simple service
 
-First spin up the seaport server:
+First spin up a seaport server:
 
 ```
-$ seaport 9090
-seaport listening on :9090
+$ seaport listen 9090
 ```
 
 then obtain a port for a server called `'web'`:
@@ -26,25 +28,23 @@ server.js:
 
 ``` js
 var seaport = require('seaport');
-var ports = seaport.connect('localhost', 9090, { secret : 'beep boop' });
+var ports = seaport.connect('localhost', 9090);
 var http = require('http');
 
 var server = http.createServer(function (req, res) {
     res.end('beep boop\r\n');
 });
 
-ports.service('web@1.2.3', function (port, ready) {
-    server.listen(port, ready);
-});
+server.listen(ports.register('web@1.2.3'));
 ```
 
-now just `get()` that `'web'` service!
+next just `get()` that `'web'` service from another script!
 
 client.js:
 
 ``` js
 var seaport = require('seaport');
-var ports = seaport.connect(9090, { secret : 'beep boop' });
+var ports = seaport.connect(9090);
 var request = require('request');
 
 ports.get('web@1.2.x', function (ps) {
@@ -65,34 +65,32 @@ beep boop
 and if you spin up `client.js` before `server.js` then it still works because
 `get()` queues the response!
 
-command-line usage
-==================
+# command-line usage
 
 ```
-Usage:
-  
-  OPTIONS
-  
-    --secret   Use a service password for seaport connections.
+usage:
 
-  seaport port OPTIONS
+  seaport listen PORT OPTIONS
 
-    Create seaport server.
+    Create a seaport server on PORT.
 
-  seaport host:port show OPTIONS
+    OPTIONS
+ 
+      --authorize KEY.json    Load authorized keys from KEY.json.
 
-    Show the port map from the server at host:port.
+  seaport show HOST:PORT
 
-  seaport host:port service name@version OPTIONS -- [COMMAND...]
+    Show the seaport records for the server running at HOST:PORT.
+
+  seaport query HOST:PORT PATTERN
+
+    Run a query for PATTERN against the server running at HOST:PORT.
+
+  seaport register NAME@VERSION -- [COMMAND...]
 
     Register a service. COMMAND will get an assigned port to use as
     its last argument. If COMMAND exits it will be restarted.
-
-  seaport host:port query name@version OPTIONS
-
-    Query the server for services matching the name@version pattern.
-    The version may contain semver patterns to specify a range.
-    Prints out a JSON array of host:port strings.
+ 
 ```
 
 methods

@@ -1,37 +1,12 @@
 #!/usr/bin/env node
 var seaport = require('../');
 var spawn = require('child_process').spawn;
+var fs = require('fs');
 
-var argv = require('optimist')
-    .demand(1)
-    .usage([
-        'Usage:',
-        '',
-        '  OPTIONS',
-        '',
-        '    --secret   Use a service password for seaport connections.',
-        '',
-        '  $0 port',
-        '',
-        '    Create seaport server.',
-        '',
-        '  $0 host:port show',
-        '',
-        '    Show the port map from the server at host:port.',
-        '',
-        '  $0 host:port service name@version [COMMAND...]',
-        '',
-        '    Register a service. COMMAND will get an assigned port to use as',
-        '    its last argument. If COMMAND exits it will be restarted.',
-        '',
-        '  $0 host:port query name@version',
-        '',
-        '    Query the server for services matching the name@version pattern.',
-        '    The version may contain semver patterns to specify a range.',
-        '    Prints out a JSON array of host:port strings.',
-    ].join('\r\n'))
-    .argv
-;
+var argv = require('optimist').argv;
+if (!argv._[0]) {
+    return fs.createReadStream(__dirname + '/usage.txt').pipe(process.stdout);
+}
 
 if (typeof argv._[0] === 'number') {
     var port = argv._[0];

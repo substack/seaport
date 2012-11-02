@@ -1,0 +1,23 @@
+usage:
+
+  seaport listen PORT OPTIONS
+
+    Create a seaport server on PORT.
+
+    OPTIONS
+ 
+      --authorize KEY.json    Load authorized keys from KEY.json.
+
+  seaport show HOST:PORT
+
+    Show the seaport records for the server running at HOST:PORT.
+
+  seaport query HOST:PORT PATTERN
+
+    Run a query for PATTERN against the server running at HOST:PORT.
+
+  seaport register NAME@VERSION -- [COMMAND...]
+
+    Register a service. COMMAND will get an assigned port to use as
+    its last argument. If COMMAND exits it will be restarted.
+ 
