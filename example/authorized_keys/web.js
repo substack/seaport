@@ -6,4 +6,3 @@ var server = http.createServer(function (req, res) {
     res.end('beep boop\n');
 });
 server.listen(ports.register('web@1.2.3'));
-console.log(server.address().port);

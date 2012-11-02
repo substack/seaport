@@ -140,6 +140,74 @@ $ curl -H 'Host: unstable' localhost:5000
 version 0.1.0
 ```
 
+## authorized keys
+
+For security you can sign messages and maintain a list of authorized public keys
+which are allowed to register services and make updates.
+
+First make some PEM keypairs with
+[rsa-json](http://github.com/substack/rsa-json):
+
+```
+$ mkdir keys
+$ rsa-json > keys/hub.json
+$ rsa-json > keys/web.json
+```
+
+Now we can create a seaport with an authorized keys list:
+
+``` js
+var fs = require('fs');
+var publicKeys = fs.readdirSync(__dirname + '/keys')
+    .filter(function (x) { return /\.json$/.test(x) })
+    .map(function (x) { return require('./keys/' + x).public })
+;
+var seaport = require('seaport');
+
+var opts = require('./keys/hub.json');
+opts.authorized = publicKeys;
+
+var ports = seaport.createServer(opts);
+ports.listen(9090);
+```
+
+Now we can register a server with an authorized key:
+
+``` js
+var seaport = require('seaport');
+var ports = seaport.connect(9090, require('./keys/web.json'));
+
+var http = require('http');
+var server = http.createServer(function (req, res) {
+    res.end('beep boop\n');
+});
+server.listen(ports.register('web@1.2.3'));
+```
+
+No credentials are required to query the entries, only to register and update
+entries. Our client can just query seaport directly:
+
+``` js
+var seaport = require('seaport');
+var ports = seaport.connect(9090);
+var request = require('request');
+
+ports.get('web@1.2.x', function (ps) {
+    var u = 'http://' + ps[0].host + ':' + ps[0].port;
+    var r = request(u);
+    
+    r.pipe(process.stdout);
+    r.on('end', ports.close.bind(ports));
+});
+```
+
+***
+
+```
+$ node client.js
+beep boop
+```
+
 # methods
 
 ```

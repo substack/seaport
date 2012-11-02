@@ -5,7 +5,8 @@ var publicKeys = fs.readdirSync(__dirname + '/keys')
 ;
 var seaport = require('../../');
 
-var ports = seaport.createServer({
-    authorized : publicKeys
-});
+var opts = require('./keys/hub.json');
+opts.authorized = publicKeys;
+
+var ports = seaport.createServer(opts);
 ports.listen(9090);
