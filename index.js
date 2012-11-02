@@ -5,7 +5,7 @@ exports = module.exports = function () {
     return seaport.apply(this, arguments);
 };
 
-exports.connect = function (port, host) {
+exports.connect = function () {
     var args = [].slice.call(arguments);
     var opts = {};
     for (var i = 0; i < args.length; i++) {
@@ -15,23 +15,25 @@ exports.connect = function (port, host) {
             break;
         }
     }
+    var port = args[0];
+    var host = args[1];
     
     if (typeof port === 'string' && typeof host === 'number') {
-        args[0] = host;
-        args[1] = port;
+        host = args[0];
+        port = args[1];
     }
     if (typeof port === 'string' && /:\d+$/.test(port)) {
         host = port.split(':')[0];
         port = port.split(':')[1];
     }
-    if (typeof port === 'string' && !/^\d+$/.test(port)) {
+    if (typeof port === 'string' && /^\d+$/.test(port)) {
         port = Number(port);
     }
     
     var s = seaport(opts);
     var c = (function reconnect () {
         if (s.closed) return;
-        var c = net.connect.apply(null, args);
+        var c = net.connect.call(null, port, host);
         var active = true;
         
         c.on('end', onend);
