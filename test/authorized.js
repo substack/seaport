@@ -31,7 +31,7 @@ test('allow authorized hosts', function (t) {
     var ports = seaport.connect(server.address().port, keys[1]);
     ports.once('reject', function (from, msg) {
         t.fail('message from ' + from + ' rejected');
-        //t.end();
+        t.end();
     });
     
     var port = ports.register('http');
