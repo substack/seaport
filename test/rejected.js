@@ -3,14 +3,23 @@ var seaport = require('../');
 
 var crypto = require('crypto');
 
-var keys = {};
+var keys = [
+    (function () {
+        // never use a value this low in real code
+        // 256 just makes the test run faster
+        var d = crypto.createDiffieHellman(256);
+        d.generateKeys();
+        return {
+            public : d.getPublicKey('base64'),
+            private : d.getPrivateKey('base64')
+        };
+    })()
+];
 
 test('reject unauthorized hosts', function (t) {
     t.plan(1);
     
-    var server = seaport.createServer({
-        authorized : [ keys.public ]
-    });
+    var server = seaport.createServer({ authorized : keys });
     server.listen(0);
     
     server.on('register', function (service) {
