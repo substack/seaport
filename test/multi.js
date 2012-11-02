@@ -18,6 +18,10 @@ test('multi-availability', function (t) {
     
     (function () {
         var s = server1.createStream();
+        server1.register({
+            role : 'seaport',
+            port : server1.address().port
+        });
         s.pipe(net.connect(server0.address().port)).pipe(s);
     })();
     
