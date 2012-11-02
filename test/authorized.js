@@ -29,7 +29,7 @@ test('allow authorized hosts', function (t) {
     t.plan(2);
     
     var server = seaport.createServer({
-        authorized : keys,
+        authorized : keys.map(function (k) { return k.public }),
         public : keys[0].public,
         private : keys[0].private,
     });
