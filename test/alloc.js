@@ -17,26 +17,25 @@ test('alloc and free', function (t) {
         ports.close();
     });
     
-    server.on('free', function () {
-        ports = seaport.connect('localhost', port);
+    server.once('free', function () {
+        ports = seaport.connect(port);
         
         server.once('register', function (alloc) {
             t.equal(alloc.port, gotPort);
-            
-            ports.close();
-            server.close();
-            t.end();
-            setTimeout(function () {
-                process.exit(); // whatever
-            }, 100);
         });
         ports.register('http', gotPort);
     });
     
     server.listen(port);
     
-    var ports = seaport.connect('localhost', port);
+    var ports = seaport.connect(port);
     
     gotPort = ports.register('http');
     t.ok(gotPort >= 10000 && gotPort < 65536);
+    
+    t.on('end', function () {
+        ports.close();
+        server.close();
+    });
+    
 });

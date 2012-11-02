@@ -1,7 +1,9 @@
 var net = require('net');
 var seaport = require('./lib/seaport');
 
-exports = module.exports = seaport;
+exports = module.exports = function () {
+    return seaport.apply(this, arguments);
+};
 
 exports.connect = function (port, host) {
     var args = arguments;
@@ -18,25 +20,30 @@ exports.connect = function (port, host) {
     }
     
     var s = seaport();
-    var c;
+    var c = (function reconnect () {
+        if (s.closed) return;
+        var c = net.connect.apply(null, args);
+        var active = true;
+        
+        c.on('end', onend);
+        c.on('error', onend);
+        c.on('close', onend);
+        
+        c.pipe(s.createStream()).pipe(c);
+        
+        return c;
+        
+        function onend () {
+            if (s.closed) return;
+            if (!active) return;
+            active = false;
+            setTimeout(reconnect, 1000);
+        }
+    })();
     
     s.on('close', function () {
         if (c) c.end();
     });
-    
-    (function reconnect () {
-        c = net.connect.apply(null, args);
-        c.pipe(s.createStream()).pipe(c);
-        c.on('error', function (err) {
-            if (s.closed) return;
-            setTimeout(reconnect, 1000);
-        });
-        
-        c.on('close', function () {
-            if (s.closed) return;
-            setTimeout(reconnect, 1000);
-        });
-    })();
     
     return s;
 };
@@ -47,6 +54,8 @@ exports.createServer = function () {
         c.pipe(s.createStream(c.address().address)).pipe(c);
     });
     s.listen = s.server.listen.bind(s.server);
-    s.close = s.server.close.bind(s.server);
+    s.on('close', function () {
+        s.server.close();
+    });
     return s;
 };

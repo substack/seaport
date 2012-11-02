@@ -21,9 +21,6 @@ test('allocate with metadata', function (t) {
             ports.close();
             server.close();
             t.end();
-            setTimeout(function () {
-                process.exit(); // whatever
-            }, 100);
         });
         
         var ps = ports.query('http');
@@ -34,7 +31,7 @@ test('allocate with metadata', function (t) {
         ports.close();
     });
     
-    server.on('free', function (alloc) {
+    server.once('free', function (alloc) {
         t.equal(alloc.beep, 'boop');
         ports = seaport.connect('localhost', port);
         ports.register('http', { port : gotPort, foo : 'bar' });

@@ -7,6 +7,7 @@
         "url" : "git://github.com/substack/seaport.git"
     },
     "main" : "index.js",
+    "browserify" : "lib/seaport.js",
     "bin" : {
         "seaport" : "bin/cli.js"
     },
