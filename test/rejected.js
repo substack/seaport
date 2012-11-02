@@ -29,9 +29,9 @@ test('reject unauthorized hosts', function (t) {
     });
     
     var ports = seaport.connect(server.address().port, keys[1]);
-    server.once('reject', function (from, msg) {
-        t.equal(msg.type, 'service');
-        t.equal(msg._node, ports.doc.id);
+    ports.once('reject', function (from, msg) {
+        t.equal(msg.type, 'address');
+        t.equal(msg.node, ports.doc.id);
     });
     
     var port = ports.register('http');
