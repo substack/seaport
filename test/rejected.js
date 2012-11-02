@@ -2,27 +2,17 @@ var test = require('tap').test;
 var seaport = require('../');
 
 var crypto = require('crypto');
-
-function makePair () {
-    // never use a value this low in real code
-    // 256 just makes the test run faster
-    var d = crypto.createDiffieHellman(256);
-    d.generateKeys();
-    return {
-        public : {
-            algorithm : 'SHA1',
-            data : d.getPublicKey('base64'),
-            encoding : 'base64'
-        },
-        private : {
-            algorithm : 'RSA-SHA1',
-            data : d.getPrivateKey('base64'),
-            encoding : 'base64'
-        }
-    };
-}
-
-var keys = [ makePair(), makePair() ];
+var fs = require('fs');
+var keys = [
+    {
+        private : fs.readFileSync(__dirname + '/keys/beep'),
+        public : fs.readFileSync(__dirname + '/keys/beep.pem'),
+    },
+    {
+        private : fs.readFileSync(__dirname + '/keys/boop'),
+        public : fs.readFileSync(__dirname + '/keys/boop.pem'),
+    },
+];
 
 test('reject unauthorized hosts', function (t) {
     t.plan(2);

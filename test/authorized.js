@@ -4,24 +4,12 @@ var seaport = require('../');
 var fs = require('fs');
 var keys = [
     {
-        private : {
-            data : fs.readFileSync(__dirname + '/keys/beep'),
-            algorithm : 'RSA-SHA1',
-        },
-        public : {
-            data : fs.readFileSync(__dirname + '/keys/beep.pem'),
-            algorithm : 'RSA-SHA1',
-        }
+        private : fs.readFileSync(__dirname + '/keys/beep'),
+        public : fs.readFileSync(__dirname + '/keys/beep.pem'),
     },
     {
-        private : {
-            data : fs.readFileSync(__dirname + '/keys/boop'),
-            algorithm : 'RSA-SHA1',
-        },
-        public : {
-            data : fs.readFileSync(__dirname + '/keys/boop.pem'),
-            algorithm : 'RSA-SHA1',
-        }
+        private : fs.readFileSync(__dirname + '/keys/boop'),
+        public : fs.readFileSync(__dirname + '/keys/boop.pem'),
     },
 ];
 
