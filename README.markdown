@@ -14,7 +14,10 @@ running.
 
 # example
 
-## simple service
+## register a service
+
+In this example we'll register a service with seaport and then elsewhere connect
+to it.
 
 First spin up a seaport server:
 
@@ -65,6 +68,78 @@ beep boop
 and if you spin up `client.js` before `server.js` then it still works because
 `get()` queues the response!
 
+## http router
+
+In this example we'll create an http router that will route to different
+versions of our application based on the http host header provided.
+
+First we'll create a seaport server and http proxy process, `router.js`:
+
+``` js
+var seaport = require('seaport');
+var server = seaport.createServer()
+server.listen(5001);
+
+var bouncy = require('bouncy');
+bouncy(function (req, bounce) {
+    var domains = (req.headers.host || '').split('.');
+    var service = 'http@' + ({
+        unstable : '0.1.x',
+        stable : '0.0.x'
+    }[domains[0]] || '0.0.x');
+    
+    var ps = server.query(service);
+    
+    if (ps.length === 0) {
+        var res = bounce.respond();
+        res.end('service not available\n');
+    }
+    else {
+        bounce(ps[Math.floor(Math.random() * ps.length)]);
+    }
+}).listen(5000);
+```
+
+Now we can register different versions of the `http` process:
+
+server_a.js:
+
+``` js
+var seaport = require('seaport');
+var ports = seaport.connect('localhost', 5001);
+var http = require('http');
+
+var server = http.createServer(function (req, res) {
+    res.end('version 0.0.0\r\n');
+});
+
+server.listen(ports.register('http@0.0.0'));
+```
+
+server_b.js:
+
+``` js
+var seaport = require('seaport');
+var ports = seaport.connect('localhost', 5001);
+var http = require('http');
+
+var server = http.createServer(function (req, res) {
+    res.end('version 0.1.0\r\n');
+});
+
+server.listen(ports.register('http@0.1.0'));
+```
+
+Now once all these processes are running, we can query the http proxy and get
+back different versions of our service:
+
+```
+$ curl -H 'Host: stable' localhost:5000
+version 0.0.0
+$ curl -H 'Host: unstable' localhost:5000
+version 0.1.0
+```
+
 # command-line usage
 
 ```
@@ -93,8 +168,7 @@ usage:
  
 ```
 
-methods
-=======
+# methods
 
 ```
 var seaport = require('seaport')
@@ -104,21 +178,18 @@ All the parameters that take a `role` parameter can be intelligently versioned
 with [semvers](https://github.com/isaacs/node-semver) by specifying a version in
 the `role` parameter after an `'@'` character.
 
-var ports = seaport.connect(...)
---------------------------------
+## var ports = seaport.connect(...)
 
 Connect to the seaport service at `...`.
 
-ports.get(role, cb)
--------------------
+## ports.get(role, cb)
 
 Request an array of host/port objects through `cb(services)` that fulfill `role`.
 
 If there are no such services then the callback `cb` will get queued until some
 service fulfilling `role` gets allocated.
 
-ports.service(role, meta={}, cb)
---------------------------------
+## ports.service(role, meta={}, cb)
 
 Create a service fulfilling the role of `role`.
 
@@ -130,8 +201,7 @@ You can optionally supply a metadata object `meta` that will be merged into the
 result objects available when you call `.get()` or `.query()`. If you supply
 `'host'` or `'port'` keys they will be overwritten.
 
-ports.allocate(role, meta={}, cb)
----------------------------------
+## ports.allocate(role, meta={}, cb)
 
 Request a port to fulfil a `role`. `cb(port, ready)` fires with the result.
 
@@ -143,8 +213,7 @@ You can optionally supply a metadata object `meta` that will be merged into the
 result objects available when you call `.get()` or `.query()`. If you supply
 `'host'` or `'port'` keys they will be overwritten.
 
-ports.free(port, cb)
---------------------
+## ports.free(port, cb)
 
 Give a port back. `cb(alloc)` fires when complete. You will get back the `alloc`
 object that you would have gotten if you'd queried the service directly.
@@ -153,8 +222,7 @@ If `port` is an object, you can free ports on other services besides the
 presently connected host by passing in a `host` field in addition to a `port`
 field.
 
-ports.assume(role, port or meta={}, cb)
----------------------------------------
+## ports.assume(role, port or meta={}, cb)
 
 Dictate to the server what port you are listening on.
 This is useful for re-establishing a route without restarting the server.
@@ -165,8 +233,7 @@ you must supply `meta.port` as the port argument.
 
 Other keys used by seaport like `'host'` will be overwritten.
 
-ports.query(role, cb)
----------------------
+## ports.query(role, cb)
 
 Get the services that satisfy the role `role` in `cb(services)`.
 Everything after the `'@'` in `role` will be treated as a semver. If the semver
@@ -175,8 +242,7 @@ is invalid (but not undefined) the algorithm will resort to exact matches.
 Services are just objects that look like: `{ host : '1.2.3.4', port : 5678 }`.
 Services can also include metadata that you've given them.
 
-ports.on(eventName, cb)
------------------------
+## ports.on(eventName, cb)
 
 Subscribe to events (`'free'`, `'allocate'`, and `'assume'`) from the remote
 seaport server. `ports` will also emit local `'up'`, `'down'`, and `'reconnect'`
@@ -189,22 +255,7 @@ Note that you won't get events while the seaport server is down so you should
 probably listen for the `'up'` event from `ports` and then call `ports.query()`
 if you are trying to keep a local cache of registry entries.
 
-server methods
-==============
-
-Instead of using the command-line tool to spin up a seaport server, you can use
-these api methods:
-
-var server = seaport.createServer()
------------------------------------
-
-Create a new dnode seaport server.
-
-The server emits `'allocate'`, `'assume'`, and `'free'` events when clients
-allocate, assume, and free ports.
-
-install
-=======
+# install
 
 To get the seaport library, with [npm](http://npmjs.org) do:
 
@@ -218,7 +269,6 @@ To get the seaport command, do:
 npm install -g seaport
 ```
 
-license
-=======
+# license
 
 MIT
