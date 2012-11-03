@@ -35,9 +35,15 @@ exports.connect = function () {
     }
     
     var s = seaport(opts);
+    var conIx = 0;
+    
     var c = (function reconnect () {
         if (s.closed) return;
-        var c = net.connect.call(null, port, host);
+        
+        var hubs = [ { port : port, host : host } ].concat(s.query('seaport'));
+        var c = net.connect.call(null, hubs[conIx].port, hubs[conIx].host);
+        conIx = (conIx + 1) % hubs.length;
+        
         var active = true;
         
         c.on('connect', s.emit.bind(s, 'connect'));

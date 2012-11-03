@@ -41,7 +41,7 @@ test('multi-availability', function (t) {
         setTimeout(function () {
             t.equal(ports.query('moo')[0].port, mport);
             t.equal(server1.query('moo')[0].port, mport);
-        }, 200);
+        }, 2000);
     }, 300);
     
     t.on('end', function () {
