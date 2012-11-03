@@ -1,6 +1,5 @@
 var seaport = require('../');
 var test = require('tap').test;
-var net = require('net');
 
 var destroyer = require('destroyer');
 
@@ -18,11 +17,14 @@ test('multi-availability', function (t) {
     
     (function () {
         var s = server1.createStream();
-        server1.register({
+        var c = seaport.connect(server0.address().port);
+        server1.on('close', c.close.bind(c));
+        s.pipe(c.createStream()).pipe(s);
+        
+        c.register({
             role : 'seaport',
             port : server1.address().port
         });
-        s.pipe(net.connect(server0.address().port)).pipe(s);
     })();
     
     var ports = seaport.connect(server0.address().port);
