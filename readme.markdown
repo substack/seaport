@@ -238,7 +238,8 @@ the keypairs.
 Create a seaport instance piped to a tcp connection at `...`.
 
 If the server at `...` is not available or the connection drops, the connection
-is retried every second.
+is retried every second. If the seaport server is down, other hubs that
+registered themselves with the role `'seaport'` are tried in a round-robin.
 
 ## var s = seaport.createServer(opts)
 
@@ -302,6 +303,17 @@ Updates include registering services and setting keys.
 ## s.close()
 
 Close a seaport connection or server. Cancel any pending requests.
+
+## s.peer(...)
+
+Seaport server instances created with `seaport.createServer()` can be hooked
+into an existing seaport server to add multi-availability to a seaport network.
+
+Just supply the same connection arguments for `.peer()` as
+`seaport.connect(...)` takes to establish a connection. The seaport service will
+be registered in the services table so that clients know to start doing a
+round-robin hunting for reachable servers when the connection they are presently
+on goes down.
 
 # events
 
