@@ -15,17 +15,7 @@ test('multi-availability', function (t) {
     server0.listen(0);
     server1.listen(0);
     
-    (function () {
-        var s = server1.createStream();
-        var c = seaport.connect(server0.address().port);
-        server1.on('close', c.close.bind(c));
-        s.pipe(c.createStream()).pipe(s);
-        
-        c.register({
-            role : 'seaport',
-            port : server1.address().port
-        });
-    })();
+    server1.peer(server0.address().port);
     
     var ports = seaport.connect(server0.address().port);
     var wport = ports.register('woo');

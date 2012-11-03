@@ -1,5 +1,6 @@
 var net = require('net');
 var seaport = require('./lib/seaport');
+var version = require('./package.json').version;
 
 exports = module.exports = function () {
     return seaport.apply(this, arguments);
@@ -80,6 +81,26 @@ exports.createServer = function (opts) {
     });
     s.listen = s.server.listen.bind(s.server);
     s.address = s.server.address.bind(s.server);
+    
+    s.peer = function () {
+        if (!s.address()) {
+            var args = arguments;
+            s.once('listening', function () {
+                s.peer.apply(s, args);
+            });
+            return;
+        }
+        
+        var stream = s.createStream();
+        var c = exports.connect.apply(this, arguments);
+        s.on('close', c.close.bind(c));
+        stream.pipe(c.createStream()).pipe(stream);
+        
+        c.register({
+            role : 'seaport@' + version,
+            port : s.address().port
+        });
+    };
     
     s.on('close', function () {
         s.server.close();
