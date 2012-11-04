@@ -10,7 +10,7 @@ architecture grows to span many processes on many machines. Just register your
 services with seaport and then query seaport to see where your services are
 running.
 
-![crane](http://substack.net/images/crane.png)
+![crane](http://substack.net/images/seaport.png)
 
 # example
 
