@@ -77,7 +77,9 @@ exports.createServer = function (opts) {
     var s = seaport(opts);
     
     s.server = net.createServer(function (c) {
-        c.pipe(s.createStream(c.address().address)).pipe(c);
+        var stream = s.createStream(c.address().address);
+        c.on('error', stream.emit.bind(stream, 'error'));
+        c.pipe(stream).pipe(c);
     });
     s.listen = s.server.listen.bind(s.server);
     s.address = s.server.address.bind(s.server);
