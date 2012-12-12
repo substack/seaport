@@ -6,7 +6,7 @@ var fs = require('fs');
 var argv = require('optimist').argv;
 var cmd = argv._[0];
 
-if (argv.v || argv.verion) {
+if (argv.v || argv.version) {
     return console.log(require('../package.json').version);
 }
 
