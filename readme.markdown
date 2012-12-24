@@ -347,6 +347,10 @@ Emitted when a connection established by `seaport.connect()` drops.
 
 The `'close'` event fires when `s.close()` is called.
 
+## s.on('synced', function () {})
+
+Emitted when a connection established by `seaport.connect()` is synchronized with the other end. Emitted twice on a new connection, the seaport is fully synchronized on the second `synced` event.
+
 # command-line usage
 
 ```
