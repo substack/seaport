@@ -53,7 +53,11 @@ exports.connect = function () {
         c.on('error', onend);
         c.on('close', onend);
         
-        c.pipe(s.createStream()).pipe(c);
+        var stream = s.createStream();
+
+        c.pipe(stream).pipe(c);
+
+        stream.on('synced', s.emit.bind(s, 'synced'));
         
         return c;
         
