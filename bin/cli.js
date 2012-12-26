@@ -67,13 +67,15 @@ if (cmd === 'register') {
     
     if (argv.key) opts.key = JSON.parse(fs.readFileSync(argv.key, 'utf8'));
     
-    ports.register(opts, function respawn (port) {
+    var port = ports.register(opts);
+    
+    (function respawn () {
         var ps = spawn(argv._[3], argv._.slice(4).concat(port));
         ps.stdout.pipe(process.stdout, { end : false });
         ps.stderr.pipe(process.stderr, { end : false });
         
         ps.on('exit', function () {
-            setTimeout(respawn, 1000, port);
+            setTimeout(respawn, 1000);
         });
-    });
+    })();
 }
