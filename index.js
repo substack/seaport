@@ -20,8 +20,8 @@ exports.connect = function () {
             break;
         }
     }
-    var port = args[0];
-    var host = args[1];
+    var port = args[0] || opts.port;
+    var host = args[1] || opts.host;
     
     if (typeof port === 'string' && typeof host === 'number') {
         host = args[0];
