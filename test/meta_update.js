@@ -2,7 +2,7 @@ var seaport = require('../');
 var test = require('tap').test;
 
 test('update meta params at runtime', function (t) {
-    t.plan(6);
+    t.plan(7);
     var server = seaport.createServer();
     server.listen(0);
     
@@ -28,6 +28,7 @@ test('update meta params at runtime', function (t) {
         ports[0].doc.set(ps[0].id, ps[0]);
         
         setTimeout(function () {
+            t.equal(ports[1].query('woo').length, 1);
             t.equal(ports[1].query('woo')[0].beep, 'BOOP');
             t.equal(server.query('woo')[0].beep, 'BOOP');
         }, 100);
