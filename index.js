@@ -81,11 +81,10 @@ exports.createServer = function (opts) {
     var s = seaport(opts);
     
     s.server = net.createServer(function (c) {
-        c.pipe(s.createStream(c.address().address))
-         .pipe(c)
-         .on('error', function (error) {
+        c.on('error', function (error) {
             c.emit('end');
         });
+        c.pipe(s.createStream(c.address().address)).pipe(c);
     });
     s.listen = s.server.listen.bind(s.server);
     s.address = s.server.address.bind(s.server);
