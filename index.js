@@ -81,7 +81,11 @@ exports.createServer = function (opts) {
     var s = seaport(opts);
     
     s.server = net.createServer(function (c) {
-        c.pipe(s.createStream(c.address().address)).pipe(c);
+        c.pipe(s.createStream(c.address().address))
+         .pipe(c)
+         .on('error', function (error) {
+            c.emit('end');
+        });
     });
     s.listen = s.server.listen.bind(s.server);
     s.address = s.server.address.bind(s.server);
@@ -94,7 +98,6 @@ exports.createServer = function (opts) {
             });
             return;
         }
-        
         var stream = s.createStream();
         var c = exports.connect.apply(this, arguments);
         s.on('close', c.close.bind(c));
