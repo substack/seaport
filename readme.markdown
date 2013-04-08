@@ -247,6 +247,10 @@ Create a seaport instance with an attached tcp server with `.listen()` and
 `.address()` methods that will set up streams in "server mode" for incoming tcp
 connections.
 
+Internally seaport uses a heartbeat to help identify stale or orphaned service
+registrations. Use `opts.heartbeatInterval`, in milliseconds, to set the interval
+that clients should update their heartbeat. The default heartbeatInterval is `60000`.
+
 ## s.createStream(host)
 
 Create a duplex stream of the underlying
