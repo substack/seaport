@@ -84,7 +84,7 @@ exports.createServer = function (opts) {
         c.on('error', function (error) {
             c.emit('end');
         });
-        c.pipe(s.createStream(c.address().address)).pipe(c);
+        c.pipe(s.createStream(c.remoteAddress)).pipe(c);
     });
     s.listen = s.server.listen.bind(s.server);
     s.address = s.server.address.bind(s.server);
