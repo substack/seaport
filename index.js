@@ -78,6 +78,8 @@ exports.connect = function () {
 };
 
 exports.createServer = function (opts) {
+    if (!opts) opts = {};
+    opts.isServer = true;
     var s = seaport(opts);
     
     s.server = net.createServer(function (c) {
@@ -111,7 +113,7 @@ exports.createServer = function (opts) {
     s.on('close', function () {
         s.server.close();
     });
-    
+
     s.server.on('listening', s.emit.bind(s, 'listening'));
     s.server.on('connection', s.emit.bind(s, 'connection'));
     
