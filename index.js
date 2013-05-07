@@ -88,9 +88,14 @@ exports.createServer = function (opts) {
         });
         c.pipe(s.createStream(c.address().address)).pipe(c);
     });
-    s.listen = s.server.listen.bind(s.server);
     s.address = s.server.address.bind(s.server);
-    
+
+    var listenArgs;
+    s.listen = function () {
+        listenArgs = arguments;
+        s.server.listen.apply(s.server, arguments);
+    };
+
     s.peer = function () {
         if (!s.address()) {
             var args = arguments;
@@ -114,7 +119,19 @@ exports.createServer = function (opts) {
         s.server.close();
     });
 
-    s.server.on('listening', s.emit.bind(s, 'listening'));
+    s.server.on('listening', function () {
+        listenArgs = null;
+        s.emit('listening');
+    });
+
+    s.server.on('error', function (err) {
+        if (err.code === 'EADDRINUSE') {
+            s.peer.apply(s, listenArgs);
+        } else {
+            s.emit('error', err);
+        }
+    });
+
     s.server.on('connection', s.emit.bind(s, 'connection'));
     
     return s;
