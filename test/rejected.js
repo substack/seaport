@@ -18,7 +18,7 @@ test('reject unauthorized hosts', function (t) {
     t.plan(2);
     
     var server = seaport.createServer({
-        authorized : [ keys[0] ],
+        authorized : [ keys[0].public ],
         public : keys[0].public,
         private : keys[0].private,
     });
@@ -29,9 +29,9 @@ test('reject unauthorized hosts', function (t) {
     });
     
     var ports = seaport.connect(server.address().port, keys[1]);
-    ports.once('reject', function (from, msg) {
-        t.equal(msg.type, 'address');
-        t.equal(msg.node, ports.doc.id);
+    server.once('reject', function (from, msg) {
+        t.equal(msg.type, 'service');
+        t.equal(msg._node, ports.doc.id);
     });
     
     var port = ports.register('http');
