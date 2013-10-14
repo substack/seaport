@@ -371,6 +371,11 @@ usage:
   seaport show HOST:PORT
 
     Show the seaport records for the server running at HOST:PORT.
+ 
+  seaport watch HOST:PORT
+
+    Listen for register and free events from the seaport registry.
+    For even more output use `-v` or `--verbose`.
 
   seaport query HOST:PORT PATTERN
 
@@ -385,6 +390,7 @@ usage:
     
     --key=key.json    Load a public/private PEM keypair from key.json.
     --meta.KEY=...    Set json metadata on the service record.
+ 
 ```
 
 # install

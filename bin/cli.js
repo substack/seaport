@@ -61,7 +61,7 @@ if (cmd === 'watch') {
         ].join(' ');
         
         if (ch.type === null) {
-            console.log('UNREGISTER ' + parts);
+            console.log('FREE ' + parts);
         }
         else {
             console.log('REGISTER ' + parts);
