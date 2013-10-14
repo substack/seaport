@@ -6,7 +6,7 @@ var fs = require('fs');
 var argv = require('optimist').argv;
 var cmd = argv._[0];
 
-if (argv.v || argv.version) {
+if (argv.version) {
     return console.log(require('../package.json').version);
 }
 
@@ -59,11 +59,20 @@ if (cmd === 'watch') {
             row.state.host + ':' + row.state.port,
             '[' + row.state.id + ']'
         ].join(' ');
+        
         if (ch.type === null) {
             console.log('UNREGISTER ' + parts);
         }
         else {
             console.log('REGISTER ' + parts);
+        }
+        
+        if (argv.v || argv.verbose) {
+            console.log(JSON.stringify(row, null, 2)
+                .split('\n')
+                .map(function (line) { return '  ' + line })
+                .join('\n')
+            );
         }
     });
 }
