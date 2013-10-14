@@ -51,6 +51,23 @@ if (cmd === 'query' || cmd === 'show') {
     return;
 }
 
+if (cmd === 'watch') {
+    var ports = seaport.connect(argv._[1]);
+    ports.services.on('changes', function (row, ch) {
+        var parts = [
+            row.state.role + '@' + row.state.version,
+            row.state.host + ':' + row.state.port,
+            '[' + row.state.id + ']'
+        ].join(' ');
+        if (ch.type === null) {
+            console.log('UNREGISTER ' + parts);
+        }
+        else {
+            console.log('REGISTER ' + parts);
+        }
+    });
+}
+
 if (cmd === 'register') {
     var ports = seaport.connect(argv._[1]);
     var opts = JSON.parse(argv.meta || '{}');
