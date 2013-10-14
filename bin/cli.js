@@ -43,20 +43,11 @@ if (cmd === 'listen') {
 
 if (cmd === 'query' || cmd === 'show') {
     var ports = seaport.connect(argv._[1]);
-    var sync_count = 0
-    ports.on('synced', function() {
-        if (++sync_count == 2) {
-            var ps = ports.query(argv._[2]);
-            console.log(JSON.stringify(ps, null, 2));
-            ports.close();
-            clearTimeout(timeout);
-        }
-    });
-    var timeout = setTimeout(function(){
-        console.error('timed out');
-        console.log('[]');
+    ports.on('synced', function () {
+        var ps = ports.query(argv._[2]);
+        console.log(JSON.stringify(ps, null, 2));
         ports.close();
-    }, 1000)
+    });
     return;
 }
 
