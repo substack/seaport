@@ -9,7 +9,7 @@
     "main" : "index.js",
     "browserify" : "lib/seaport.js",
     "bin" : {
-        "seaport" : "bin/cli.js"
+        "seaport" : "bin/cmd.js"
     },
     "keywords" : [
         "port",

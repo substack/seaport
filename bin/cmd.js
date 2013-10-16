@@ -60,8 +60,18 @@ if (cmd === 'watch') {
             '[' + row.state.id + ']'
         ].join(' ');
         
+        var keys = ch && Object.keys(ch);
         if (ch.type === null) {
             console.log('FREE ' + parts);
+        }
+        else if (keys.length === 1 && ch.type === 'service') {
+            console.log('RECLAIM ' + parts);
+        }
+        else if (keys.length === 1 && ch.type === 'stale-service') {
+            console.log('STALE ' + parts);
+        }
+        else if (keys.length === 1 && ch._heartbeat) {
+            if (argv.vvv) console.log('HEARTBEAT ' + parts);
         }
         else {
             console.log('REGISTER ' + parts);
