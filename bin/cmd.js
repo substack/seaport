@@ -38,6 +38,12 @@ if (cmd === 'listen') {
     var server = seaport.createServer(argv, opts);
     server.listen(port);
     console.log('seaport listening on :' + port);
+    if (argv.peer) {
+        server.once("listening", function() {
+            console.log("peering with : "+argv.peer);
+            server.peer(argv.peer);
+        });
+    }
     return;
 }
 
