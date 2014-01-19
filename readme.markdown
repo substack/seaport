@@ -278,6 +278,9 @@ range for ports to be, set `opts.range` (default: `[ 10000, 65535 ]`).
 If you don't want you specify `role` you can also use `opts.role` and
 `opts.version`.
 
+You can control what the key name will be by setting `opts.id` yourself.
+Otherwise a random hex string will be used.
+
 ## var services = s.query(search)
 
 Query the seaport entries with `search` as a `name@semver` string.
