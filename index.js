@@ -43,7 +43,7 @@ exports.connect = function () {
         
         var hubs = [ { port : port, host : host } ].concat(s.query('seaport'));
         if (hubs.length <= conIx) conIx = hubs.length - 1;
-        var c = net.connect.call(null, hubs[conIx].port, hubs[conIx].host);
+        c = net.connect.call(null, hubs[conIx].port, hubs[conIx].host);
         conIx = (conIx + 1) % hubs.length;
         
         var active = true;
