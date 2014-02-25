@@ -1,5 +1,4 @@
 var seaport = require('../../lib/seaport.js');
-//var ports = seaport.connect('localhost', 5001);
 var ports = seaport();
 var net = require('net');
 var stream = ports.createStream();
