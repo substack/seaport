@@ -1,11 +1,7 @@
 var net = require('net');
-var seaport = require('../../lib/seaport.js');
-
-var ports = seaport();
-var server = net.createServer(function (stream) {
-    return stream.pipe(ports.createStream()).pipe(stream);
-});
-server.listen(5001);
+var seaport = require('../../');
+var ports = seaport.createServer();
+ports.listen(5001);
 
 var bouncy = require('bouncy');
 bouncy(function (req, res, bounce) {

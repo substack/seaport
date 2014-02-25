@@ -1,11 +1,7 @@
-var seaport = require('../../lib/seaport.js');
-var ports = seaport();
-var net = require('net');
-var stream = ports.createStream();
-stream.pipe(net.connect(5001, 'localhost')).pipe(stream);
+var seaport = require('../../');
+var ports = seaport.connect('localhost', 5001);
 
 var http = require('http');
-
 var server = http.createServer(function (req, res) {
     res.end('version 0.1.0\r\n');
 });

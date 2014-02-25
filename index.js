@@ -58,8 +58,6 @@ exports.connect = function () {
 
         c.pipe(stream).pipe(c);
 
-        stream.on('synced', s.emit.bind(s, 'synced'));
-        
         return c;
         
         function onend () {
