@@ -1,19 +1,23 @@
-var seaport = require('../../');
-var server = seaport.createServer()
+var net = require('net');
+var seaport = require('../../lib/seaport.js');
+
+var ports = seaport();
+var server = net.createServer(function (stream) {
+    return stream.pipe(ports.createStream()).pipe(stream);
+});
 server.listen(5001);
 
 var bouncy = require('bouncy');
-bouncy(function (req, bounce) {
+bouncy(function (req, res, bounce) {
     var domains = (req.headers.host || '').split('.');
     var service = 'http@' + ({
         unstable : '0.1.x',
         stable : '0.0.x'
     }[domains[0]] || '0.0.x');
     
-    var ps = server.query(service);
+    var ps = ports.query(service);
     
     if (ps.length === 0) {
-        var res = bounce.respond();
         res.end('service not available\n');
     }
     else {
