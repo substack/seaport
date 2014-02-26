@@ -64,7 +64,7 @@ exports.connect = function () {
             if (s.closed) return;
             if (!active) return;
             active = false;
-            stream.destroy();
+            if (stream.destroy) stream.destroy();
             s.emit('disconnect');
             setTimeout(reconnect, 1000);
         }
