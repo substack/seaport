@@ -20,3 +20,7 @@ bouncy(function (req, res, bounce) {
         bounce(ps[Math.floor(Math.random() * ps.length)]);
     }
 }).listen(5000);
+
+setInterval(function () {
+    console.log(ports.query());
+}, 1000);
