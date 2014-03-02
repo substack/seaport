@@ -55,9 +55,9 @@ exports.connect = function () {
         c.on('close', onend);
         
         var stream = s.createStream();
-
+        stream.on('timeout', onend);
+        
         c.pipe(stream).pipe(c);
-
         return c;
         
         function onend () {
