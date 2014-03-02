@@ -4,12 +4,12 @@ var seaport = require('../');
 var fs = require('fs');
 var keys = [
     {
-        private : fs.readFileSync(__dirname + '/keys/beep'),
-        public : fs.readFileSync(__dirname + '/keys/beep.pem'),
+        private : fs.readFileSync(__dirname + '/keys/beep', 'utf8'),
+        public : fs.readFileSync(__dirname + '/keys/beep.pem', 'utf8'),
     },
     {
-        private : fs.readFileSync(__dirname + '/keys/boop'),
-        public : fs.readFileSync(__dirname + '/keys/boop.pem'),
+        private : fs.readFileSync(__dirname + '/keys/boop', 'utf8'),
+        public : fs.readFileSync(__dirname + '/keys/boop.pem', 'utf8'),
     },
 ];
 
