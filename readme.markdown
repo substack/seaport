@@ -281,6 +281,11 @@ If you don't want you specify `role` you can also use `opts.role` and
 You can control what the key name will be by setting `opts.id` yourself.
 Otherwise a random hex string will be used.
 
+## var meta = s.registerMeta(role, opts)
+
+Like `s.register()`, but return the entire meta object instead of just the
+`meta.port`. This is handy if you need the `id` to update metadata later.
+
 ## var services = s.query(search)
 
 Query the seaport entries with `search` as a `name@semver` string.
@@ -311,16 +316,10 @@ Updates include registering services and setting keys.
 
 Close a seaport connection or server. Cancel any pending requests.
 
-## s.peer(...)
+## s.set(id, value)
 
-Seaport server instances created with `seaport.createServer()` can be hooked
-into an existing seaport server to add multi-availability to a seaport network.
-
-Just supply the same connection arguments for `.peer()` as
-`seaport.connect(...)` takes to establish a connection. The seaport service will
-be registered in the services table so that clients know to start doing a
-round-robin hunting for reachable servers when the connection they are presently
-on goes down.
+Update a registration value by its `id`, broadcasting the new registration meta
+`value`.
 
 # events
 
@@ -354,9 +353,9 @@ Emitted when a connection established by `seaport.connect()` drops.
 
 The `'close'` event fires when `s.close()` is called.
 
-## s.on('synced', function () {})
+## s.on('timeout', function () {})
 
-Emitted when a connection established by `seaport.connect()` is synchronized with the other end. Emitted twice on a new connection, the seaport is fully synchronized on the second `synced` event.
+When the connection times out, this event fires.
 
 # command-line usage
 

@@ -30,7 +30,7 @@ test('versions', function (t) {
             t.equal(ps[0].port, ports_['beep@1.2.3']);
         });
         
-        ports[0].get('beep@>1.2', function (ps) {
+        ports[0].get('beep@>1.2.0', function (ps) {
             t.equal(ps.length, 2);
             t.deepEqual(
                 ps.map(function (p) { return p.port }).sort(),

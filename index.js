@@ -55,18 +55,16 @@ exports.connect = function () {
         c.on('close', onend);
         
         var stream = s.createStream();
-
-        c.pipe(stream).pipe(c);
-
-        stream.on('synced', s.emit.bind(s, 'synced'));
+        stream.on('timeout', onend);
         
+        c.pipe(stream).pipe(c);
         return c;
         
         function onend () {
             if (s.closed) return;
             if (!active) return;
             active = false;
-            stream.destroy();
+            if (stream.destroy) stream.destroy();
             s.emit('disconnect');
             setTimeout(reconnect, 1000);
         }
