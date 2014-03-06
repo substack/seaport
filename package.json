@@ -30,7 +30,6 @@
     "optimist": "~0.3.5",
     "semver": "~1.1.0",
     "inherits": "~1.0.0",
-    "crdt": "~3.5.0",
     "through": "~1.1.1",
     "secure-peer": "~0.2.1",
     "defined": "~0.0.0",
