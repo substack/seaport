@@ -43,7 +43,7 @@ if (cmd === 'listen') {
 
 if (cmd === 'query' || cmd === 'show') {
     var ports = seaport.connect(argv._[1]);
-    ports.on('synced', function () {
+    ports.once('synced', function () {
         var ps = ports.query(argv._[2]);
         console.log(JSON.stringify(ps, null, 2));
         ports.close();
