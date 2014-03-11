@@ -27,17 +27,17 @@
     "test": "tap test/*.js"
   },
   "dependencies": {
-    "optimist": "~0.3.5",
-    "semver": "~1.1.0",
-    "inherits": "~1.0.0",
-    "through": "~1.1.1",
-    "secure-peer": "~0.2.1",
     "defined": "~0.0.0",
     "indexof": "~0.0.1",
+    "inherits": "~1.0.0",
     "object-keys": "~0.5.0",
+    "optimist": "~0.3.5",
     "readable-stream": "~1.0.26",
+    "secure-peer": "~0.2.1",
+    "semver": "~1.1.0",
     "split": "~0.3.0",
-    "stream-combiner": "~0.0.4"
+    "stream-combiner": "~0.0.4",
+    "through": "~2.3.4"
   },
   "engine": {
     "node": ">=0.8"
