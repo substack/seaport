@@ -45,6 +45,13 @@ if (cmd === 'query' || cmd === 'show') {
     var ports = seaport.connect(argv._[1]);
     ports.once('synced', function () {
         var ps = ports.query(argv._[2]);
+        ps = ps.map(function (p) {
+            for (var i = 3; i < argv._.length; i++) {
+                p = p[argv._[i]];
+                if (!p) break;
+            }
+            return p;
+        });
         console.log(JSON.stringify(ps, null, 2));
         ports.close();
     });
