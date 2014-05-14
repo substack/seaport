@@ -72,6 +72,7 @@ exports.connect = function () {
     
     s.on('close', function () {
         if (c) c.end();
+        if (c.destroy) c.destroy();
     });
     
     return s;
