@@ -1,6 +1,7 @@
 var net = require('net');
 var seaport = require('./lib/seaport');
 var version = require('./package.json').version;
+var nodeVersion = process.version.replace(/^v/,'').replace(/\.[^.]+$/, '');
 
 exports = module.exports = function () {
     return seaport.apply(this, arguments);
@@ -72,7 +73,9 @@ exports.connect = function () {
     
     s.on('close', function () {
         if (c) c.end();
-        if (c.destroy) c.destroy();
+        if (nodeVersion !== '0.8') {
+            if (c.destroy) c.destroy();
+        }
     });
     
     return s;
