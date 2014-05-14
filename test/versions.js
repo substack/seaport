@@ -1,5 +1,6 @@
 var seaport = require('../');
-var test = require('tap').test;
+var tap = require('tap');
+var test = tap.test;
 
 test('versions', function (t) {
     t.plan(5);
@@ -45,4 +46,8 @@ test('versions', function (t) {
         ports[1].close();
         ports[2].close();
     });
+});
+
+tap.on('end', function() {
+    process.exit();
 });
