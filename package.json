@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "destroyer": "~0.0.0",
-    "macgyver": "^1.10.1",
+    "macgyver": "~1.10.1",
     "tap": "~0.4.9"
   },
   "license": "MIT",
