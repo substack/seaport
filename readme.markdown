@@ -248,13 +248,14 @@ Create a seaport instance with an attached tcp server with `.listen()` and
 connections.
 
 Internally seaport uses a heartbeat to help identify stale or orphaned service
-registrations. Use `opts.heartbeatInterval`, in milliseconds, to set the interval
-that clients should update their heartbeat. The default heartbeatInterval is `60000`.
+registrations. Use `opts.heartbeat`, in milliseconds, to set the interval
+that clients should update their heartbeat. The default heartbeat is `15000`.
+Services will be considered stale when if they have not responded to a heartbeat
+in `opts.timeout` milliseconds. The default timeout is `opts.heartbeat * 3`.
 
 ## s.createStream(host)
 
-Create a duplex stream of the underlying
-[crdt](https://github.com/dominictarr/crdt) object.
+Create a duplex stream that implements the seaport protocol.
 
 If `host` is specified, seaport goes into "server mode" where it stores the
 `host` value on the network for the remote endpoint's node id.
