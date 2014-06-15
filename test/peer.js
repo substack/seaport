@@ -8,8 +8,6 @@ test('peer registrations and frees propogate', function (t) {
     var mac = macgyver()
     var s1 = seaport.createServer()
     var s2 = seaport.createServer()
-    s1.id = 's1'
-    s2.id = 's2'
     s1.listen(0)
     s2.listen(0)
 
@@ -20,8 +18,9 @@ test('peer registrations and frees propogate', function (t) {
     var s1reg = mac(reg)
     var s2reg = mac(reg)
 
-    s1reg.isCalled(3, 3)
-    s2reg.isCalled(3, 3)
+    s1reg.times(3)
+    s2reg.times(3)
+
     s1.on('register', s1reg)
     s2.on('register', s2reg)
 
@@ -50,17 +49,12 @@ test('peer registrations and frees propogate', function (t) {
                 t.equal(s2.query('web').length, 0, 's1 free')
                 t.equal(s2.query('web').length, 0, 's2 free')
                 t.end()
-            }, 2000)
+            }, 200)
 
-        }, 2000)
+        }, 200)
     })
 
     t.on('end', function () {
-        ;[s1,s2,c1,c2,web1].forEach(function (server) {
-            server.close()
-        })
+        process.exit(0)
     })
 })
-
-
-
