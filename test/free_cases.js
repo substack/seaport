@@ -22,8 +22,10 @@ test('frees with no auth', function (t) {
     })
 
     client.on('exit', function () {
-        t.equal(s1.query().length, 0)
-        t.end()
+        setTimeout(function () {
+            t.equal(s1.query().length, 0)
+            t.end()
+        }, 200)
     })
 
     t.on('end', function () {
