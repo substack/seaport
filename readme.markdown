@@ -393,6 +393,7 @@ usage:
     
     --key=key.json    Load a public/private PEM keypair from key.json.
     --meta.KEY=...    Set json metadata on the service record.
+    --peer=HOST:PORT  Peer with an existing Seaport server
  
 ```
 
