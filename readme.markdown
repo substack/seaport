@@ -263,7 +263,7 @@ If `host` is specified, seaport goes into "server mode" where it stores the
 ## var port = s.register(role, opts)
 
 Register the service described by the string `role`
-(name@verion, version optional). Return the port to use for the service.
+(name@version, version optional). Return the port to use for the service.
 
 Registrations are valid so long as the connection to the seaport server is still
 alive. When the connection to the seaport server goes down, all registrations
